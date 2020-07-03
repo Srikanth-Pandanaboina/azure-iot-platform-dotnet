@@ -3,7 +3,6 @@ parameters:
 
 steps:
   - script: |-
-      echo resources.pipeline.${{parameters.pipelineResourceName}}.projectName: $(resources.pipeline.${{parameters.pipelineResourceName}}.projectName)
       echo resources.pipeline.${{parameters.pipelineResourceName}}.projectID: $(resources.pipeline.${{parameters.pipelineResourceName}}.projectID)
       echo resources.pipeline.${{parameters.pipelineResourceName}}.pipelineName: $(resources.pipeline.${{parameters.pipelineResourceName}}.pipelineName)
       echo resources.pipeline.${{parameters.pipelineResourceName}}.pipelineID: $(resources.pipeline.${{parameters.pipelineResourceName}}.pipelineID)
