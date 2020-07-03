@@ -61,6 +61,8 @@ variables:
     value: mmm-iot-platform-ingress
   - name: publishedFilesArtifactName
     value: publishFiles
+  - name: functionsArtifactName
+    value: functionsFiles
   - name: helmInstallTimeoutInSeconds
     value: 600
   - name: mmmIotPlatformServicesHelmChartValuesFile
@@ -161,7 +163,15 @@ stages:
             displayName: Build assemblies
 
           - task: CopyFiles@2
-            displayName: Prepare file artifacts
+            displayName: Prepare Azure Functions artifacts
+            inputs:
+              contents: |
+                src/functions/**/*
+              targetFolder: $(functionsArtifactName)
+              cleanTargetFolder: true
+
+          - task: CopyFiles@2
+            displayName: Prepare services artifacts
             inputs:
               contents: |
                 *.sln
@@ -171,12 +181,17 @@ stages:
                 .nuget/**/*
                 src/services/**/*
                 test/services/**/*
+                src/functions/**/*
               targetFolder: $(publishedFilesArtifactName)
               cleanTargetFolder: true
 
           - publish: $(publishedFilesArtifactName)
             artifact: $(publishedFilesArtifactName)
-            displayName: Publish file artifacts
+            displayName: Publish services artifacts
+
+          - publish: $(functionsArtifactName)
+            artifact: $(functionsArtifactName)
+            displayName: Publish Azure Functions artifacts
 
   - stage: listCommitsSinceLastRelease
     displayName: List commits since last release

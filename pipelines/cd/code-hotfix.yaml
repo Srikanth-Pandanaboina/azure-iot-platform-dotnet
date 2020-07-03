@@ -49,13 +49,20 @@ stages:
                 exit 1
               fi
 
-              echo "Image tag: '$(imageTag)'"
-              if [ -z "$(imageTag)" ]
-              then
-                echo "A value for the 'imageTag' variable must be provided" > /dev/stderr
-                exit 1
-              fi
-            displayName: Check parameters
+          echo "Image tag: '$(imageTag)'"
+          if [ -z "$(imageTag)" ]
+          then
+            echo "A value for the 'imageTag' variable must be provided" > /dev/stderr
+            exit 1
+          fi
+
+          echo "Test pipeline run ID: '$(testPipelineRunId)'"
+          if [ -z "$(testPipelineRunId)" ]
+          then
+            echo "A value for the 'testPipelineRunId' variable must be provided" > /dev/stderr
+            exit 1
+          fi
+        displayName: Check parameters
 
   - stage: deployCode
     displayName: Deploy code
@@ -70,3 +77,7 @@ stages:
           applicationShortCode: $(applicationShortCode)
           environmentCategory: $(environmentCategory)
           imageTag: $(imageTag)
+          azureDevOpsProjectId: AzurePlatform
+          testPipelineId: 453
+          runVersion: specific
+          testPipelineRunId: $(testPipelineRunId)
