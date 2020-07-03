@@ -1,11 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>Mmm.Iot.Functions.Messaging</AssemblyName>
+    <AssemblyName>Mmm.Iot.Functions.RuleActions</AssemblyName>
     <RootNamespace>$(AssemblyName)</RootNamespace>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AzureFunctionsVersion>v3</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="4.1.1"/>
@@ -13,14 +9,5 @@
     <PackageReference Include="Mustachio" Version="2.1.0"/>
     <PackageReference Include="Microsoft.Azure.WebJobs.Host.Storage" Version="3.0.13"/>
     <EmbeddedResource Include="Files/AlertEmail.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="host.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="local.settings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </None>
   </ItemGroup>
 </Project>

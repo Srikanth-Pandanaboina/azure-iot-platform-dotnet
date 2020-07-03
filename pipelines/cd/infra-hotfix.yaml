@@ -91,6 +91,13 @@ stages:
                 exit 1
               fi
 
+              echo "AKS agent VM size: '$(aksAgentVmSize)'"
+              if [ -z "$(aksAgentVmSize)" ]
+              then
+                echo "A value for the 'aksAgentVmSize' variable must be provided" > /dev/stderr
+                exit 1
+              fi
+
               echo "Test pipeline run ID: '$(testPipelineRunId)'"
               if [ -z "$(testPipelineRunId)" ]
               then
@@ -99,25 +106,20 @@ stages:
               fi
         displayName: Check parameters
 
-  - stage: deployInfrastructure
-    displayName: Deploy infrastructure
-    dependsOn:
-      - checkParameters
-    jobs:
-      - template: ../templates/jobs-deploy-infra.yaml
-        parameters:
-          subscriptionName: $(subscriptionName)
-          locationName: $(locationName)
-          environmentName: $(environmentName)
-          subscriptionId: $(subscriptionId)
-          applicationCode: $(applicationCode)
-          applicationShortCode: $(applicationShortCode)
-          environmentCategory: $(environmentCategory)
-          kubernetesVersion: $(kubernetesVersion)
-          sendgridEmail: $(sendGridEmail)
-          sysAdmins: $(sysAdmins)
-          aksAgentVmSize: $(aksAgentVmSize)
-          azureDevOpsProjectId: AzurePlatform
-          testPipelineId: 453
-          runVersion: specific
-          testPipelineRunId: $(testPipelineRunId)
+  - template: ../templates/jobs-deploy-infra.yaml
+    parameters:
+      subscriptionName: $(subscriptionName)
+      locationName: $(locationName)
+      environmentName: $(environmentName)
+      subscriptionId: $(subscriptionId)
+      applicationCode: $(applicationCode)
+      applicationShortCode: $(applicationShortCode)
+      environmentCategory: $(environmentCategory)
+      kubernetesVersion: $(kubernetesVersion)
+      sendgridEmail: $(sendGridEmail)
+      sysAdmins: $(sysAdmins)
+      aksAgentVmSize: $(aksAgentVmSize)
+      azureDevOpsProjectId: AzurePlatform
+      testPipelineId: 453
+      runVersion: specific
+      testPipelineRunId: $(testPipelineRunId)
