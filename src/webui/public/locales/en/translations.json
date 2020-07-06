@@ -120,7 +120,53 @@
         "sendDiagnosticsCheckbox": "Yes, share information with Microsoft",
         "dontSendDiagnosticsCheckbox": "No, don't share information with Microsoft",
         "sendDiagnosticsMicrosoftPrivacyUrl": "Privacy Statement",
-        "diagnosticsLoadError": "Error updating diagnostics preference"
+        "diagnosticsLoadError": "Error updating diagnostics preference",
+        "firmware": {
+            "error": {
+                "noVersion": "The value ${version} must be defined in your firmware JSON template.",
+                "upload": "An error occurred while uploading your firmware JSON template",
+                "invalid": "Invalid firmware JSON template entry",
+                "unknown": "An unknown error occurred.",
+                "retrieval": "An error occurred while retrieving the current firmware JSON template",
+                "doubleSlash": "Firmware JSON template keys may not contain '//'",
+                "reserved": {
+                    "id": "The key 'id' is reserved and cannot be used in the firmware JSON template"
+                }
+            },
+            "name": "Firmware JSON Template",
+            "description": "Upload a firmware JSON template for use with firmware package upload on the packages page.",
+            "edit": "Edit",
+            "save": "Save",
+            "cancel": "Cancel",
+            "variables": {
+                "name": "Template Variables",
+                "summary": "The following template variables may be used in your firmware JSON template. Usage: ${parent.child}, e.g ${blobData.FileUri}",
+                "grid": {
+                    "parent": "Parent",
+                    "child": "Child",
+                    "description": "Description"
+                },
+                "descriptions": {
+                    "version": "Parent only. This variable is required in your template and is overwritten with your firmware package's version value. Usage: ${version}",
+                    "blobData": {
+                        "FileUri": "The Blob Storage URI for your uploaded firmware file",
+                        "CheckSum": "The CheckSum value for your blob storage uploaded file"
+                    },
+                    "packageFile": {
+                        "name": "The name of your uploaded firmware file",
+                        "lastModified": "MS from epoch timestamp",
+                        "lastModifiedDate": "Human readable date timestamp",
+                        "size": "File size in bytes",
+                        "type": "Uploaded file type"
+                    },
+                    "deployment": {
+                        "id": "When deploying your package, this value will be replaced by the ID of your deployment"
+                    }
+                }
+            }
+            
+
+        }
     },
     "helpFlyout": {
         "title": "Documentation"
@@ -924,6 +970,8 @@
                 "browse": "Browse",
                 "browseFirmwareText": "for a firmware file",
                 "browseText": "for a package file",
+                "firmwareTemplateTip": "Initial JSON data is derived from your template. You can view and edit this template from the Settings menu.",
+                "firmwareJson": "Firmware JSON",
                 "packageNamePlaceholder": "Enter Package Name",
                 "packageVersionPlaceholder": "Enter Package Version",
                 "packageTypePlaceholder": "Select package type",
