@@ -17,9 +17,13 @@ export const toDeviceGroupModel = function (deviceGroup = {}) {
         conditions: "conditions",
         eTag: "eTag",
         telemetryFormat: "telemetryFormat",
+        isPinned: "isPinned",
+        sortOrder: "sortOrder",
         supportedMethods: "supportedMethods",
     });
     deviceGroup["telemetryFormat"] = deviceGroup.telemetryFormat || [];
+    deviceGroup["isPinned"] = deviceGroup.isPinned || false;
+    deviceGroup["sortOrder"] = deviceGroup.sortOrder || 0;
     deviceGroup["supportedMethods"] = deviceGroup.supportedMethods || [];
     return deviceGroup;
 };
@@ -43,6 +47,8 @@ export const toCreateDeviceGroupRequestModel = (params = {}) => ({
         toDeviceConditionModel(condition)
     ),
     TelemetryFormat: params.telemetryFormat || [],
+    IsPinned: params.isPinned || false,
+    SortOrder: params.sortOrder || 0,
     SupportedMethods: params.supportedMethods || [],
 });
 
@@ -54,6 +60,8 @@ export const toUpdateDeviceGroupRequestModel = (params = {}) => ({
         toDeviceConditionModel(condition)
     ),
     TelemetryFormat: params.telemetryFormat || [],
+    IsPinned: params.isPinned || false,
+    SortOrder: params.sortOrder || 0,
     SupportedMethods: params.supportedMethods || [],
 });
 
