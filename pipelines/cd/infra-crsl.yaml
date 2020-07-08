@@ -26,7 +26,7 @@ stages:
           applicationCode: crsliot
           applicationShortCode: crsl
           environmentCategory: dev
-          kubernetesVersion: 1.17.5
+          kubernetesVersion: 1.18.1
           sendgridEmail: aschmidt4@mmm.com
           aksAgentVmSize: Standard_D8_v3
           sysAdmins: >-
