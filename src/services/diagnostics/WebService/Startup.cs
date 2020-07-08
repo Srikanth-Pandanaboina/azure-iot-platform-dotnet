@@ -1,4 +1,4 @@
-﻿// <copyright file="Startup.cs" company="3M">
+// <copyright file="Startup.cs" company="3M">
 // Copyright (c) 3M. All rights reserved.
 // </copyright>
 
@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Mmm.Iot.Common.Services.AIPreprocessors;
 using Mmm.Iot.Common.Services.Auth;
 
 namespace Mmm.Iot.Diagnostics.WebService
@@ -35,6 +36,7 @@ namespace Mmm.Iot.Diagnostics.WebService
             });
             services.AddCors();
             services.AddMvc().AddControllersAsServices().AddNewtonsoftJson();
+            services.AddApplicationInsightsTelemetryProcessor<HealthProbeTelemetryProcessor>();
             services.AddHttpContextAccessor();
             this.ApplicationContainer = new DependencyResolution().Setup(services, this.Configuration);
             return new AutofacServiceProvider(this.ApplicationContainer);
