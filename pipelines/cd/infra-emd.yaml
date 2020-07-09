@@ -2,11 +2,54 @@ trigger: none
 pr: none
 pool:
   vmImage: ubuntu-latest
+resources:
+  pipelines:
+    - pipeline: test
+      source: azure-iot-platform-dotnet.ci.test
 variables:
   locationName: centralus
+  ${{ if eq(variables['Build.Reason'], 'ResourceTrigger') }}:
+    _runVersion: latestFromBranch
+    _testPipelineRunId: n/a
+  ${{ if ne(variables['Build.Reason'], 'ResourceTrigger') }}:
+    _runVersion: specific
+    _testPipelineRunId: $(testPipelineRunId)
 stages:
+  - stage: checkParameters
+    displayName: Check parameters
+    dependsOn: []
+    jobs:
+      - job: checkParameters
+        displayName: Check parameters
+        steps:
+          - checkout: none
+
+          - script: |-
+              echo "Test pipeline run ID: '$(_testPipelineRunId)'"
+              if [ -z "$(_testPipelineRunId)" ]
+              then
+                echo "A value for the 'testPipelineRunId' variable must be provided" > /dev/stderr
+                exit 1
+              fi
+            displayName: Check parameters
+
+  - stage: printPipelineResourceVariables
+    displayName: Print pipeline resource variables
+    dependsOn: []
+    jobs:
+      - job: printPipelineResourceVariables
+        displayName: Print pipeline resource variables
+        steps:
+          - checkout: none
+
+          - template: ../templates/print-pipeline-resource-variables.yaml
+            parameters:
+              pipelineResourceName: test
+
   - stage: emdDev
     displayName: EMD dev
+    dependsOn:
+      - checkParameters
     jobs:
       - template: ../templates/jobs-deploy-infra.yaml
         parameters:
@@ -19,6 +62,10 @@ stages:
           environmentName: IoT_EMD_Environment_DEV
           kubernetesVersion: 1.16.8
           sendgridEmail: cfinn@mmm.com
+          azureDevOpsProjectId: $(resources.pipeline.test.projectID)
+          testPipelineId: $(resources.pipeline.test.pipelineID)
+          runVersion: $(_runVersion)
+          testPipelineRunId: $(_testPipelineRunId)
           sysAdmins: >-
             [{"UserId": "3e30f301-4f57-4b3e-949a-3ff8e93870b5", "Name": "Viswanath Kotha CW"},
              {"UserId": "00e4068a-944e-4cd2-bc2a-77b1d33a1db3", "Name": "Jonathan Asbury"},
@@ -54,6 +101,10 @@ stages:
           environmentName: IoT_EMD_Environment_QA
           kubernetesVersion: 1.16.8
           sendgridEmail: cfinn@mmm.com
+          azureDevOpsProjectId: $(resources.pipeline.test.projectID)
+          testPipelineId: $(resources.pipeline.test.pipelineID)
+          runVersion: $(_runVersion)
+          testPipelineRunId: $(_testPipelineRunId)
           sysAdmins: >-
             [{"UserId": "3e30f301-4f57-4b3e-949a-3ff8e93870b5", "Name": "Viswanath Kotha CW"},
              {"UserId": "00e4068a-944e-4cd2-bc2a-77b1d33a1db3", "Name": "Jonathan Asbury"},
@@ -89,6 +140,10 @@ stages:
           environmentName: IoT_EMD_Environment_CT
           kubernetesVersion: 1.16.8
           sendgridEmail: cfinn@mmm.com
+          azureDevOpsProjectId: $(resources.pipeline.test.projectID)
+          testPipelineId: $(resources.pipeline.test.pipelineID)
+          runVersion: $(_runVersion)
+          testPipelineRunId: $(_testPipelineRunId)
           sysAdmins: >-
             [{"UserId": "3e30f301-4f57-4b3e-949a-3ff8e93870b5", "Name": "Viswanath Kotha CW"},
              {"UserId": "00e4068a-944e-4cd2-bc2a-77b1d33a1db3", "Name": "Jonathan Asbury"},
