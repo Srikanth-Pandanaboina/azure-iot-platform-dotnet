@@ -51,13 +51,6 @@ jobs:
             echo "A value for the 'imageTag' variable must be provided" > /dev/stderr
             exit 1
           fi
-
-          echo "Test pipeline run ID: '$(testPipelineRunId)'"
-          if [ -z "$(testPipelineRunId)" ]
-          then
-            echo "A value for the 'testPipelineRunId' variable must be provided" > /dev/stderr
-            exit 1
-          fi
         displayName: Check parameters
 
   - template: ../templates/jobs-deploy-code.yaml
@@ -68,7 +61,3 @@ jobs:
       applicationShortCode: $(applicationShortCode)
       environmentCategory: $(environmentCategory)
       imageTag: $(imageTag)
-      azureDevOpsProjectId: AzurePlatform
-      testPipelineId: 453
-      runVersion: specific
-      testPipelineRunId: $(testPipelineRunId)
