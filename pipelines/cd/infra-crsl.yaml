@@ -101,7 +101,7 @@ stages:
           subscriptionName: 3M-CRSLAD16-BBIoTP-DEV
           locationName: $(locationName)
           appInsightsLocation: eastus
-          environmentName: IoT_CRSL_Environment_Dev
+          environmentName: GGK-Environment
           subscriptionId: c36fb2f8-f98d-40d0-90a9-d65e93acb428
           applicationCode: ggktech
           applicationShortCode: ggk
@@ -176,7 +176,7 @@ stages:
           subscriptionName: 3M-CRSLAD19-BBIoTP-Prod
           locationName: $(locationName)
           appInsightsLocation: eastus
-          environmentName: IoT_CRSL_Environment_Wkbnch
+          environmentName: IoT_CRSL_Environment_WKBNCH
           subscriptionId: dcb37438-95ca-4a68-812d-39ce0d591df2
           applicationCode: crsliot
           applicationShortCode: crsl
