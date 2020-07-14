@@ -55,12 +55,13 @@ stages:
         parameters:
           subscriptionName: 3M-ACTAIR01-CHIMSMART-Dev
           locationName: $(locationName)
+          appInsightsLocation: eastus
           environmentName: IoT_CHIM_Environment_DEV
           subscriptionId: 28299656-8110-4dc4-a33f-82a6cc3d05c2
           applicationCode: chimiot
           applicationShortCode: chim
           environmentCategory: dev
-          kubernetesVersion: 1.16.8
+          kubernetesVersion: 1.16.10
           sendgridEmail: blinzie@mmm.com
           azureDevOpsProjectId: $(resources.pipeline.test.projectID)
           testPipelineId: $(resources.pipeline.test.pipelineID)
@@ -93,12 +94,13 @@ stages:
         parameters:
           subscriptionName: 3M-ACTAIR02-CHIMSMART-QA
           locationName: $(locationName)
+          appInsightsLocation: eastus
           environmentName: IoT_CHIM_Environment_QA
           subscriptionId: 30975220-85e1-4769-8bc1-4542ec8569a0
           applicationCode: chimiot
           applicationShortCode: chim
           environmentCategory: qa
-          kubernetesVersion: 1.16.8
+          kubernetesVersion: 1.16.10
           sendgridEmail: blinzie@mmm.com
           azureDevOpsProjectId: $(resources.pipeline.test.projectID)
           testPipelineId: $(resources.pipeline.test.pipelineID)
@@ -131,12 +133,13 @@ stages:
         parameters:
           subscriptionName: 3M-ACTAIR04-CHIMSMART-PROD
           locationName: $(locationName)
+          appInsightsLocation: eastus
           environmentName: IoT_CHIM_Environment_Prod
           subscriptionId: 5401dcf9-9d00-445b-97b4-60b216ea4930
           applicationCode: chimiot
           applicationShortCode: chim
           environmentCategory: prod
-          kubernetesVersion: 1.16.8
+          kubernetesVersion: 1.16.10
           sendgridEmail: blinzie@mmm.com
           azureDevOpsProjectId: $(resources.pipeline.test.projectID)
           testPipelineId: $(resources.pipeline.test.pipelineID)
