@@ -1,0 +1,43 @@
+name: test
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: '0 6 * * *'
+env:
+  SERENITY_DOTNET_PRODUCTION_RUNTIME_ID: linux-musl-x64
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.x
+
+      # - name: Login to Azure
+      #   uses: azure/login@v1.1
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Download NuGet dependencies
+        run: >-
+          dotnet restore
+          --force
+          --no-cache
+          --no-dependencies
+          --packages .nuget
+          --runtime ${{ env.SERENITY_DOTNET_PRODUCTION_RUNTIME_ID }}
+          /p:TargetLatestRuntimePatch=true
