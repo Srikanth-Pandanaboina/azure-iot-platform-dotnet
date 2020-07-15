@@ -59,7 +59,7 @@ jobs:
           command: 'install'
           chartType: 'FilePath'
           chartPath: 'charts/mmm-iot-service'
-          releaseName: 'asa-manager-blue'
+          releaseName: 'asa-manager-green'
           overrideValues: 'nameOverride=asa-manager-test,deployment.port.http=80,deployment.probes.enabled=true,type=green,deployment.image.repository=azureiot3m/asa-manager:64908,deployment.enabled=true,service.enabled=false,deployment.name=asa-manager-green'
 
   - job: UpgradeBlueToGreen
