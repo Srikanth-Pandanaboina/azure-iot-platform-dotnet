@@ -12,10 +12,8 @@ resources:
 
 jobs:
   - job: serviceCreationHelm
-    displayname: Creation of Helm Service
     steps:
       - checkout:  azure-iot-platform-dotnet
-        displayname: Checkout to repository
 
       - task: HelmDeploy@0
         inputs:
