@@ -29,6 +29,9 @@ jobs:
           chartPath: 'charts/mmm-iot-service'
           releaseName: 'asa-manager-service'
           overrideValues: 'nameOverride=asa-manager-test,service.port=80,type=blue,deployment.enabled=false,service.enabled=true'
+  - job: BlueHelmChartCreation
+    steps:
+      - checkout: azure-iot-platform-dotnet
 
       - task: HelmDeploy@0
         inputs:
@@ -42,6 +45,10 @@ jobs:
           chartPath: 'charts/mmm-iot-service'
           releaseName: 'asa-manager-blue'
           overrideValues: 'nameOverride=asa-manager-test,deployment.port.http=80,deployment.probes.enabled=true,type=blue,deployment.image.repository=azureiot3m/asa-manager:64908,deployment.enabled=true,service.enabled=false,deployment.name=asa-manager-blue'
+
+  - job: GreenHelmChartCreation
+    steps:
+      - checkout: azure-iot-platform-dotnet 
       - task: HelmDeploy@0
         inputs:
           connectionType: 'Azure Resource Manager'
