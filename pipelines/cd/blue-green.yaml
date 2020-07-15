@@ -9,8 +9,8 @@ resources:
     -  repository: azure-iot-platform-dotnet
        type: github
        endpoint: 3mcloud
-       name: 3mcloud\azure-iot-platform-dotnet
-       ref: origin/blue-green-poc
+       name: 3mcloud/azure-iot-platform-dotnet
+       ref: blue-green-poc
 
 jobs:
   - job: serviceCreationHelm
