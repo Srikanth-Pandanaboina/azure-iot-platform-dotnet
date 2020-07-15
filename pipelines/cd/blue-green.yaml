@@ -77,3 +77,12 @@ jobs:
           chartPath: 'charts/mmm-iot-service'
           releaseName: 'asa-manager-service'
           overrideValues: 'nameOverride=asa-manager-test,service.port=80,type=blue,deployment.enabled=false,service.enabled=true'
+      - task: HelmDeploy@0
+        inputs:
+          connectionType: 'Azure Resource Manager'
+          azureSubscription: '3M-CRSLAD16-BBIoTP-Dev'
+          azureResourceGroup: 'rg-iot-ggk-dev'
+          kubernetesCluster: 'ggktech-aks-dev'
+          namespace: 'default'
+          command: 'uninstall'
+          arguments: 'asa-manager-blue'
