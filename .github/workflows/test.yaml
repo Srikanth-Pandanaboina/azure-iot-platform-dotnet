@@ -32,12 +32,12 @@ jobs:
       #   with:
       #     creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Download NuGet dependencies
-        run: >-
-          dotnet restore
-          --force
-          --no-cache
-          --no-dependencies
-          --packages .nuget
-          --runtime ${{ env.SERENITY_DOTNET_PRODUCTION_RUNTIME_ID }}
-          /p:TargetLatestRuntimePatch=true
+      # - name: Download NuGet dependencies
+      #   run: >-
+      #     dotnet restore
+      #     --force
+      #     --no-cache
+      #     --no-dependencies
+      #     --packages .nuget
+      #     --runtime ${{ env.SERENITY_DOTNET_PRODUCTION_RUNTIME_ID }}
+      #     /p:TargetLatestRuntimePatch=true
