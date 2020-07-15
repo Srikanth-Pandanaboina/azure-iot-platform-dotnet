@@ -61,3 +61,19 @@ jobs:
           chartPath: 'charts/mmm-iot-service'
           releaseName: 'asa-manager-blue'
           overrideValues: 'nameOverride=asa-manager-test,deployment.port.http=80,deployment.probes.enabled=true,type=green,deployment.image.repository=azureiot3m/asa-manager:64908,deployment.enabled=true,service.enabled=false,deployment.name=asa-manager-green'
+
+  - job: UpgradeBlueToGreen
+    steps:
+      - checkout: azure-iot-platform-dotnet
+      - task: HelmDeploy@0
+        inputs:
+          connectionType: 'Azure Resource Manager'
+          azureSubscription: '3M-CRSLAD16-BBIoTP-Dev'
+          azureResourceGroup: 'rg-iot-ggk-dev'
+          kubernetesCluster: 'ggktech-aks-dev'
+          namespace: 'default'
+          command: 'upgrade'
+          chartType: 'FilePath'
+          chartPath: 'charts/mmm-iot-service'
+          releaseName: 'asa-manager-service'
+          overrideValues: 'nameOverride=asa-manager-test,service.port=80,type=blue,deployment.enabled=false,service.enabled=true'
