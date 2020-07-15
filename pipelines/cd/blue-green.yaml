@@ -28,6 +28,6 @@ jobs:
           chartType: 'FilePath'
           chartPath: 'charts/mmm-iot-service'
           releaseName: 'asa-manager-service'
-          overrideValues: 'deployment.image.tag=64908,nameOverride=asa-manager-test,service.port=80,type=blue,selectOverride=blue,deployment.enabled=false,service.enabled=true'
+          overrideValues: 'nameOverride=asa-manager-test,service.port=80,type=blue,deployment.enabled=false,service.enabled=true'
 
     
