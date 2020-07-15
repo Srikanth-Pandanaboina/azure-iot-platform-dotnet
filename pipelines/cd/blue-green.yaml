@@ -9,7 +9,7 @@ resources:
     -  repository: azure-iot-platform-dotnet
        type: github
        endpoint: 3mcloud
-       name: MMM\azure-iot-platform-dotnet
+       name: 3mcloud\azure-iot-platform-dotnet
        ref: blue-green-poc
 
 jobs:
