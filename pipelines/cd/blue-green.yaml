@@ -1,30 +1,33 @@
 trigger:
-- blue-green-poc
+- none
 
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+resources:
+  repositories:
+    -  repository: azure-iot-platform-dotnet
+       name: MMM\azure-iot-platform-dotnet
+       ref: blue-green-poc
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+jobs:
+  - job: serviceCreationHelm
+    displayname: Creation of Helm Service
+    steps:
+      - checkout:  azure-iot-platform-dotnet
+        displayname: Checkout to repository
 
-
-- task: HelmDeploy@0
-  inputs:
-    connectionType: 'Azure Resource Manager'
-    azureSubscription: '3M-CRSLAD16-BBIoTP-Dev'
-    azureResourceGroup: 'rg-iot-ggk-dev'
-    kubernetesCluster: 'ggktech-aks-dev'
-    namespace: 'default'
-    command: 'install'
-    chartType: 'FilePath'
-    chartPath: 'charts/mmm-iot-service'
-    releaseName: 'asa-manager-service'
-    overrideValues: 'nameOverride=asa-manager-test,service.port=80,type=blue,selectOverride=blue,deployment.enabled=false,service.enabled=true'
+      - task: HelmDeploy@0
+        inputs:
+          connectionType: 'Azure Resource Manager'
+          azureSubscription: '3M-CRSLAD16-BBIoTP-Dev'
+          azureResourceGroup: 'rg-iot-ggk-dev'
+          kubernetesCluster: 'ggktech-aks-dev'
+          namespace: 'default'
+          command: 'install'
+          chartType: 'FilePath'
+          chartPath: 'charts/mmm-iot-service'
+          releaseName: 'asa-manager-service'
+          overrideValues: 'nameOverride=asa-manager-test,service.port=80,type=blue,selectOverride=blue,deployment.enabled=false,service.enabled=true'
 
     
