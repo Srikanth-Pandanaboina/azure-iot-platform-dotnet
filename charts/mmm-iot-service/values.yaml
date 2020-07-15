@@ -18,8 +18,8 @@ deployment:
   imagePullSecrets: []
   replicaCount: 1
   image:
-    repository:
-    tag:
+    repository: azureiot3m/asa-manager
+    tag: 64908
     pullPolicy: Always
 ingress:
   enabled: false
