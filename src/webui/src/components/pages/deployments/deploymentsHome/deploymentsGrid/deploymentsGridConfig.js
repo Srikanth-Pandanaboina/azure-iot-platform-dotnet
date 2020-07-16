@@ -6,11 +6,20 @@ import {
     TimeRenderer,
 } from "components/shared/cellRenderers";
 import { getPackageTypeTranslation, getConfigTypeTranslation } from "utilities";
-import { gridValueFormatters } from "components/shared/pcsGrid/pcsGridConfig";
+import {
+    gridValueFormatters,
+    SMALL_GREEN_CIRCLE,
+    SMALL_RED_CIRCLE,
+} from "components/shared/pcsGrid/pcsGridConfig";
 
 const { checkForEmpty } = gridValueFormatters;
 
 export const deploymentsColumnDefs = {
+    icon: {
+        field: "name",
+        cellClass: ({ value }) =>
+            value === "Version2.0" ? SMALL_GREEN_CIRCLE : SMALL_RED_CIRCLE,
+    },
     name: {
         headerName: "deployments.grid.name",
         field: "name",

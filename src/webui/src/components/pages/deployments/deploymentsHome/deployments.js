@@ -18,7 +18,7 @@ import { DeviceGroupDropdownContainer as DeviceGroupDropdown } from "components/
 import { ManageDeviceGroupsBtnContainer as ManageDeviceGroupsBtn } from "components/shell/manageDeviceGroupsBtn";
 import { ResetActiveDeviceQueryBtnContainer as ResetActiveDeviceQueryBtn } from "components/shell/resetActiveDeviceQueryBtn";
 import { DeploymentsGrid } from "./deploymentsGrid";
-import { DeploymentNewContainer } from "./flyouts";
+import { DeploymentNewContainer, DeploymentStatusContainer } from "./flyouts";
 import { svgs } from "utilities";
 import { CreateDeviceQueryBtnContainer as CreateDeviceQueryBtn } from "components/shell/createDeviceQueryBtn";
 
@@ -79,6 +79,17 @@ export class Deployments extends Component {
         this.props.history.push(`/deployments/${deploymentId}`);
     };
 
+    /**
+     * Handles context filter changes and calls any hard select props method
+     *
+     * @param {Array} selectedPackages A list of currently selected packages
+     */
+    onRowClicked = (selectedDeployment) => {
+        this.setState({
+            openFlyoutName: "deployment-status",
+        });
+    };
+
     render() {
         const {
                 t,
@@ -94,7 +105,8 @@ export class Deployments extends Component {
                 onContextMenuChange: this.onContextMenuChange,
                 t: t,
                 getSoftSelectId: this.getSoftSelectId,
-                onSoftSelectChange: this.onSoftSelectChange,
+                onSoftSelectChange: this.onSoftSelectChange,                
+                onRowClicked: this.onRowClicked,
             };
 
         return (
@@ -139,6 +151,12 @@ export class Deployments extends Component {
                     {!error && <DeploymentsGrid {...gridProps} />}
                     {this.state.openFlyoutName === "newDeployment" && (
                         <DeploymentNewContainer
+                            t={t}
+                            onClose={this.closeFlyout}
+                        />
+                    )}
+                    {this.state.openFlyoutName === "deployment-status" && (
+                        <DeploymentStatusContainer
                             t={t}
                             onClose={this.closeFlyout}
                         />
