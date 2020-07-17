@@ -14,6 +14,8 @@ namespace Mmm.Iot.IoTHubManager.Services
 
         Task<DeploymentServiceListModel> ListAsync();
 
+        Task<DeploymentServiceListModel> ListAllAsync();
+
         Task<DeploymentServiceModel> GetAsync(string id, bool includeDeviceStatus);
 
         Task DeleteAsync(string deploymentId, string userId, string tenantId);
@@ -21,5 +23,7 @@ namespace Mmm.Iot.IoTHubManager.Services
         Task<PackageApiModel> GetPackageAsync(string packageId);
 
         Task<DeviceGroup> GetDeviceGroupAsync(string deviceGroupId);
+
+        Task ReactivateDeploymentAsyc(string deploymentId, string userId, string tenantId);
     }
 }

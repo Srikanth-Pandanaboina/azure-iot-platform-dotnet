@@ -70,6 +70,21 @@ namespace Mmm.Iot.StorageAdapter.WebService.Controllers
             return new ValueApiModel(result);
         }
 
+        [HttpPost("collections/{collectionId}/values/{key}")]
+        public async Task<ValueApiModel> Post(string collectionId, string key, [FromBody] ValueServiceModel model)
+        {
+            if (model == null)
+            {
+                throw new InvalidInputException("The request is empty");
+            }
+
+            this.EnsureValidId(collectionId, key);
+
+            var result = await this.container.CreateAsync(collectionId, key, model);
+
+            return new ValueApiModel(result);
+        }
+
         [HttpPut("collections/{collectionId}/values/{key}")]
         public async Task<ValueApiModel> Put(string collectionId, string key, [FromBody] ValueServiceModel model)
         {

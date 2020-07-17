@@ -11,6 +11,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Devices;
 using Microsoft.Extensions.Logging;
 using Mmm.Iot.Common.Services.Config;
+using Mmm.Iot.Common.Services.External.StorageAdapter;
 using Mmm.Iot.Common.Services.Helpers;
 using Mmm.Iot.Common.Services.Models;
 using Mmm.Iot.Common.TestHelpers;
@@ -165,6 +166,7 @@ namespace Mmm.Iot.IoTHubManager.Services.Test
         private readonly string ioTHubHostName = "mockIoTHub";
         private Mock<ITenantConnectionHelper> tenantHelper;
         private Mock<IConfigClient> packageConfigClient;
+        private Mock<IStorageAdapterClient> storageAdapterClient;
         private string packageTypeLabel = "Type";
 
         public DeploymentsTest()
@@ -172,6 +174,7 @@ namespace Mmm.Iot.IoTHubManager.Services.Test
             this.registry = new Mock<RegistryManager>();
             this.tenantHelper = new Mock<ITenantConnectionHelper>();
             this.packageConfigClient = new Mock<IConfigClient>();
+            this.storageAdapterClient = new Mock<IStorageAdapterClient>();
             this.tenantHelper.Setup(e => e.GetIotHubName()).Returns(this.ioTHubHostName);
             this.tenantHelper.Setup(e => e.GetRegistry()).Returns(this.registry.Object);
             TelemetryClient mockTelemetryClient = this.InitializeMockTelemetryChannel();
@@ -188,7 +191,8 @@ namespace Mmm.Iot.IoTHubManager.Services.Test
                 new Mock<ILogger<Deployments>>().Object,
                 new Mock<IDeploymentEventLog>().Object,
                 this.tenantHelper.Object,
-                this.packageConfigClient.Object);
+                this.packageConfigClient.Object,
+                this.storageAdapterClient.Object);
         }
 
         [Theory]

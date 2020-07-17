@@ -6,16 +6,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Azure.Devices;
 using Microsoft.Extensions.Logging;
 using Mmm.Iot.Common.Services.Config;
 using Mmm.Iot.Common.Services.Exceptions;
+using Mmm.Iot.Common.Services.External.StorageAdapter;
 using Mmm.Iot.Common.Services.Helpers;
 using Mmm.Iot.Common.Services.Models;
 using Mmm.Iot.Config.Services.Models;
 using Mmm.Iot.IoTHubManager.Services.External;
 using Mmm.Iot.IoTHubManager.Services.Helpers;
 using Mmm.Iot.IoTHubManager.Services.Models;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using static Mmm.Iot.Config.Services.Models.DeviceStatusQueries;
 
@@ -39,17 +42,20 @@ namespace Mmm.Iot.IoTHubManager.Services
         private const string EdgeManifestSchema = "schemaVersion";
         private const string FailedQueryName = "error";
         private const string SuccessQueryName = "current";
+        private const string DeploymentsCollection = "deployments";
         private readonly ILogger logger;
         private readonly IDeploymentEventLog deploymentLog;
         private readonly ITenantConnectionHelper tenantHelper;
         private readonly IConfigClient configClient;
+        private readonly IStorageAdapterClient client;
 
         public Deployments(
             AppConfig config,
             ILogger<Deployments> logger,
             IDeploymentEventLog deploymentLog,
             ITenantConnectionHelper tenantConnectionHelper,
-            IConfigClient packagesConfigClient)
+            IConfigClient packagesConfigClient,
+            IStorageAdapterClient client)
         {
             if (config == null)
             {
@@ -60,6 +66,7 @@ namespace Mmm.Iot.IoTHubManager.Services
             this.deploymentLog = deploymentLog;
             this.logger = logger;
             this.configClient = packagesConfigClient;
+            this.client = client;
         }
 
         public Deployments(ITenantConnectionHelper tenantHelper)
@@ -105,6 +112,10 @@ namespace Mmm.Iot.IoTHubManager.Services
 
             var configuration = ConfigurationsHelper.ToHubConfiguration(model);
 
+            // Update the Metrics related to previous deployment which targets the same device group as the metrics
+            // will be overriden once the new deployment gets applied to the devices.
+            bool shouldMarkAsLatest = await this.UpdateMetricsOfCurrentDeployment(model.DeviceGroupId, model.Priority);
+
             // TODO: Add specific exception handling when exception types are exposed
             // https://github.com/Azure/azure-iot-sdk-csharp/issues/649
             var result = new DeploymentServiceModel(await this.tenantHelper.GetRegistry().AddConfigurationAsync(configuration));
@@ -112,10 +123,23 @@ namespace Mmm.Iot.IoTHubManager.Services
             // Setting the id so that deployment id is populated
             model.Id = result.Id;
 
-            // Log a custom event to Application Insights
-            this.deploymentLog.LogDeploymentCreate(model, tenantId, userId);
+            // Add latest tag to deployment if deployment has highest priority for the device group.
+            if (shouldMarkAsLatest)
+            {
+                if (model.Tags == null)
+                {
+                    model.Tags = new List<string>();
+                }
 
-            return result;
+                model.Tags.Add("reserved.latest");
+            }
+
+            // Store the deployment details in Cosmos DB
+            await this.StoreDeploymentInSecondaryStorage(model);
+
+            // Log a custom event to Application Insights
+            // this.deploymentLog.LogDeploymentCreate(model, tenantId, userId);
+            return model;
         }
 
         public async Task<DeploymentServiceListModel> ListAsync()
@@ -135,6 +159,11 @@ namespace Mmm.Iot.IoTHubManager.Services
                            .ToList();
 
             return new DeploymentServiceListModel(serviceModelDeployments);
+        }
+
+        public async Task<DeploymentServiceListModel> ListAllAsync()
+        {
+            return await this.GetListAsync();
         }
 
         public async Task<DeploymentServiceModel> GetAsync(string deploymentId, bool includeDeviceStatus = false)
@@ -178,6 +207,9 @@ namespace Mmm.Iot.IoTHubManager.Services
 
             await this.tenantHelper.GetRegistry().RemoveConfigurationAsync(deploymentId);
 
+            // Mark the Deployment as Inactive in CosmosDb collection
+            await this.MarkDeploymentAsInactive(deploymentId);
+
             // Log a custom event to Application Insights
             this.deploymentLog.LogDeploymentDelete(deploymentId, tenantId, userId);
         }
@@ -190,6 +222,28 @@ namespace Mmm.Iot.IoTHubManager.Services
         public async Task<DeviceGroup> GetDeviceGroupAsync(string deviceGroupId)
         {
             return await this.configClient.GetDeviceGroupAsync(deviceGroupId);
+        }
+
+        public async Task ReactivateDeploymentAsyc(string deploymentId, string userId, string tenantId)
+        {
+            var deploymentFromStorage = await this.GetDeploymentFromStorageAsync(deploymentId);
+            if (deploymentFromStorage == null)
+            {
+                throw new ResourceNotFoundException($"No Deployment details found with Id {deploymentId}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(deploymentFromStorage.PackageId) && string.IsNullOrWhiteSpace(deploymentFromStorage.PackageContent))
+            {
+                var package = await this.GetPackageAsync(deploymentFromStorage.PackageId);
+                if (package != null)
+                {
+                    deploymentFromStorage.PackageContent = package.Content;
+                }
+            }
+
+            await this.CreateAsync(deploymentFromStorage, userId, tenantId);
+
+            await this.MarkDeploymentAsActive(deploymentId);
         }
 
         private bool CheckIfDeploymentWasMadeByRM(Configuration conf)
@@ -300,6 +354,187 @@ namespace Mmm.Iot.IoTHubManager.Services
                                                             item.Value == DeploymentStatus.Pending).LongCount();
 
             return deviceMetrics;
+        }
+
+        private async Task StoreDeploymentInSecondaryStorage(DeploymentServiceModel deployment)
+        {
+            var value = JsonConvert.SerializeObject(
+                                                    deployment,
+                                                    Formatting.Indented,
+                                                    new JsonSerializerSettings
+                                                    {
+                                                        NullValueHandling = NullValueHandling.Ignore,
+                                                    });
+
+            var response = await this.client.UpdateAsync(DeploymentsCollection, deployment.Id, value, deployment.ETag);
+        }
+
+        private async Task<bool> UpdateMetricsOfCurrentDeployment(string deviceGroupId, int priority)
+        {
+            var deploymentsFromHub = await this.ListAsync();
+
+            var deploymentsOfDeviceGroup = deploymentsFromHub.Items.Where(i => i.DeviceGroupId == deviceGroupId).OrderByDescending(p => p.Priority).ThenByDescending(q => q.CreatedDateTimeUtc);
+
+            if (deploymentsOfDeviceGroup != null && deploymentsOfDeviceGroup.Count() > 0)
+            {
+                var deployment = deploymentsOfDeviceGroup.First();
+
+                if (priority >= deployment.Priority)
+                {
+                    var deploymentDetails = await this.GetDeploymentAsync(deployment.Id);
+
+                    DeploymentServiceModel currentDeployment = await this.GetDeploymentFromStorageAsync(deployment.Id);
+
+                    // Update the Device Statuses for the DeploymentId for future references.
+                    currentDeployment.DeploymentMetrics = new DeploymentMetricsServiceModel(deploymentDetails.SystemMetrics, deploymentDetails.Metrics);
+
+                    currentDeployment.DeploymentMetrics.DeviceStatuses = this.GetDeviceStatuses(deploymentDetails);
+
+                    // Since the deployment that will be created have highest priority, remove latest tag on current deployment
+                    if (currentDeployment?.Tags != null)
+                    {
+                        var existingTag = currentDeployment.Tags.FirstOrDefault(t => t.Equals("reserved.latest", StringComparison.OrdinalIgnoreCase));
+                        if (existingTag != null)
+                        {
+                            currentDeployment.Tags.Remove(existingTag);
+                        }
+                    }
+
+                    var value = JsonConvert.SerializeObject(
+                        currentDeployment,
+                        Formatting.Indented,
+                        new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                        });
+
+                    await this.client.UpdateAsync(DeploymentsCollection, currentDeployment.Id, value, currentDeployment.ETag);
+
+                    // Since the deployment that will be created have highest priority, mark it as the latest
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private async Task<Configuration> GetDeploymentAsync(string deploymentId)
+        {
+            if (string.IsNullOrEmpty(deploymentId))
+            {
+                throw new ArgumentNullException(nameof(deploymentId));
+            }
+
+            var deployment = await this.tenantHelper.GetRegistry().GetConfigurationAsync(deploymentId);
+
+            if (deployment == null)
+            {
+                throw new ResourceNotFoundException($"Deployment with id {deploymentId} not found.");
+            }
+
+            if (!this.CheckIfDeploymentWasMadeByRM(deployment))
+            {
+                throw new ResourceNotSupportedException($"Deployment with id {deploymentId}" + @" was
+                                                        created externally and therefore not supported");
+            }
+
+            return deployment;
+        }
+
+        private async Task<DeploymentServiceModel> GetDeploymentFromStorageAsync(string deploymentId)
+        {
+            var response = await this.client.GetAsync(DeploymentsCollection, deploymentId);
+            return this.CreateDeploymentServiceModel(response);
+        }
+
+        private DeploymentServiceModel CreateDeploymentServiceModel(ValueApiModel response)
+        {
+            var output = JsonConvert.DeserializeObject<DeploymentServiceModel>(response.Data);
+            output.Id = response.Key;
+            output.ETag = response.ETag;
+            if (output.Tags == null)
+            {
+                output.Tags = new List<string>();
+            }
+
+            return output;
+        }
+
+        private async Task<DeploymentServiceModel> MarkDeploymentAsInactive(string deploymentId)
+        {
+            var existingDeployment = await this.GetDeploymentFromStorageAsync(deploymentId);
+
+            if (existingDeployment != null)
+            {
+                if (existingDeployment.Tags == null)
+                {
+                    existingDeployment.Tags = new List<string>();
+                }
+
+                if (existingDeployment.Tags.Contains("reserved.inactive", StringComparer.InvariantCultureIgnoreCase))
+                {
+                    return existingDeployment;
+                }
+
+                existingDeployment.Tags.Add("reserved.inactive");
+
+                var value = JsonConvert.SerializeObject(
+                    existingDeployment,
+                    Formatting.Indented,
+                    new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                    });
+                var response = await this.client.UpdateAsync(DeploymentsCollection, deploymentId, value, existingDeployment.ETag);
+            }
+
+            return existingDeployment;
+        }
+
+        private async Task<DeploymentServiceModel> MarkDeploymentAsActive(string deploymentId)
+        {
+            var existingDeployment = await this.GetDeploymentFromStorageAsync(deploymentId);
+
+            if (existingDeployment?.Tags == null)
+            {
+                return existingDeployment;
+            }
+
+            var existingTag = existingDeployment.Tags.FirstOrDefault(t => t.Equals("reserved.inactive", StringComparison.OrdinalIgnoreCase));
+            if (existingTag == null)
+            {
+                return existingDeployment;
+            }
+
+            existingDeployment.Tags.Remove(existingTag);
+
+            var value = JsonConvert.SerializeObject(
+                existingDeployment,
+                Formatting.Indented,
+                new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                });
+            var response = await this.client.UpdateAsync(DeploymentsCollection, deploymentId, value, existingDeployment.ETag);
+
+            return existingDeployment;
+        }
+
+        private async Task<DeploymentServiceListModel> GetListAsync()
+        {
+            IEnumerable<DeploymentServiceModel> deployments = null;
+            var response = await this.client.GetAllAsync(DeploymentsCollection);
+
+            if (response != null && response.Items.Count > 0)
+            {
+                deployments = response.Items.Select(this.CreateDeploymentServiceModel);
+            }
+
+            return new DeploymentServiceListModel(deployments?.ToList());
         }
     }
 }
