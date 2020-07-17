@@ -36,6 +36,7 @@ namespace Mmm.Iot.IoTHubManager.WebService.Models
             this.Priority = serviceModel.Priority;
             this.PackageType = serviceModel.PackageType;
             this.ConfigType = serviceModel.ConfigType;
+            this.Tags = serviceModel.Tags;
             this.Metrics = new DeploymentMetricsApiModel(serviceModel.DeploymentMetrics)
             {
                 DeviceStatuses = serviceModel.DeploymentMetrics?.DeviceStatuses,
@@ -92,6 +93,9 @@ namespace Mmm.Iot.IoTHubManager.WebService.Models
 
         [JsonProperty(PropertyName = "DeviceIds")]
         public IEnumerable<string> DeviceIds { get; set; }
+
+        [JsonProperty("Tags")]
+        public IList<string> Tags { get; set; }
 
         public DeploymentServiceModel ToServiceModel()
         {
