@@ -91,6 +91,13 @@ namespace Mmm.Iot.IoTHubManager.WebService.Controllers
             return new DeploymentListApiModel(await this.deployments.ListFromStorageAsync());
         }
 
+        [HttpGet("GetAll")]
+        [Authorize("ReadAll")]
+        public async Task<DeploymentListApiModel> GetListAsync()
+        {
+            return new DeploymentListApiModel(await this.deployments.ListAllAsync());
+        }
+
         [HttpGet("{id}")]
         [Authorize("ReadAll")]
         public async Task<DeploymentApiModel> GetAsync(string id, [FromQuery] bool includeDeviceStatus = false, [FromQuery] bool isLatest = true)
@@ -117,6 +124,13 @@ namespace Mmm.Iot.IoTHubManager.WebService.Controllers
         public async Task<DeviceListApiModel> GetDeploymentImpactedDevices(string id, [FromBody] string query, [FromQuery] bool isLatest = false)
         {
             return new DeviceListApiModel(await this.deployments.GetDeviceListAsync(id, query, isLatest));
+        }
+
+        [HttpPut("{id}")]
+        [Authorize("CreateDeployments")]
+        public async Task ReactivateAsync(string id)
+        {
+            await this.deployments.ReactivateDeploymentAsyc(id, this.GetClaimsUserDetails(), this.GetTenantId());
         }
 
         private async Task HydrateDeploymentWithPackageDetails(DeploymentApiModel deployment)
