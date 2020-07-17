@@ -91,6 +91,13 @@ namespace Mmm.Iot.IoTHubManager.WebService.Controllers
             return new DeploymentListApiModel(await this.deployments.ListAsync());
         }
 
+        [HttpGet("GetAll")]
+        [Authorize("ReadAll")]
+        public async Task<DeploymentListApiModel> GetListAsync()
+        {
+            return new DeploymentListApiModel(await this.deployments.ListAllAsync());
+        }
+
         [HttpGet("{id}")]
         [Authorize("ReadAll")]
         public async Task<DeploymentApiModel> GetAsync(string id, [FromQuery] bool includeDeviceStatus = false)
@@ -103,6 +110,13 @@ namespace Mmm.Iot.IoTHubManager.WebService.Controllers
         public async Task DeleteAsync(string id)
         {
             await this.deployments.DeleteAsync(id, this.GetClaimsUserDetails(), this.GetTenantId());
+        }
+
+        [HttpPut("{id}")]
+        [Authorize("CreateDeployments")]
+        public async Task ReactivateAsync(string id)
+        {
+            await this.deployments.ReactivateDeploymentAsyc(id, this.GetClaimsUserDetails(), this.GetTenantId());
         }
 
         private async Task HydrateDeploymentWithPackageDetails(DeploymentApiModel deployment)

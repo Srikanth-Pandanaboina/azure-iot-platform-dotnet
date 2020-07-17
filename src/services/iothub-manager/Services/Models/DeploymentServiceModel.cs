@@ -92,6 +92,10 @@ namespace Mmm.Iot.IoTHubManager.Services.Models
 
         public IEnumerable<string> DeviceIds { get; set; }
 
+        public IList<string> Tags { get; set; }
+
+        public string ETag { get; set; }
+
         private void VerifyConfigurationLabel(Configuration deployment, string labelName)
         {
             if (!deployment.Labels.ContainsKey(labelName))
