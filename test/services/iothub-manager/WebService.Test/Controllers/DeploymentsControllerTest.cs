@@ -76,7 +76,7 @@ namespace Mmm.Iot.IoTHubManager.WebService.Test.Controllers
         public async Task GetDeploymentTest()
         {
             // Arrange
-            this.deploymentsMock.Setup(x => x.GetAsync(DeploymentId, false)).ReturnsAsync(new DeploymentServiceModel()
+            this.deploymentsMock.Setup(x => x.GetAsync(DeploymentId, false, true)).ReturnsAsync(new DeploymentServiceModel()
             {
                 Name = DeploymentName,
                 DeviceGroupId = DeviceGroupId,
@@ -112,7 +112,7 @@ namespace Mmm.Iot.IoTHubManager.WebService.Test.Controllers
         public async Task VerifyGroupAndPackageNameLabelsTest()
         {
             // Arrange
-            this.deploymentsMock.Setup(x => x.GetAsync(DeploymentId, false)).ReturnsAsync(new DeploymentServiceModel()
+            this.deploymentsMock.Setup(x => x.GetAsync(DeploymentId, false, true)).ReturnsAsync(new DeploymentServiceModel()
             {
                 Name = DeploymentName,
                 DeviceGroupId = DeviceGroupId,
