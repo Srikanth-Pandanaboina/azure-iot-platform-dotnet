@@ -2,34 +2,28 @@
 
 import React from "react";
 import { toDiagnosticsModel } from "services/models";
-import { LinkedComponent } from "utilities";
-import { Flyout } from "components/shared";
+import { svgs, LinkedComponent } from "utilities";
+import { BtnToolbar, Btn, Flyout, DeleteModal } from "components/shared";
+import { Toggle } from "@microsoft/azure-iot-ux-fluent-controls/lib/components/Toggle";
 
 import "./deploymentStatus.scss";
+
+const closedModalState = {
+    openModalName: undefined,
+};
 
 export class DeploymentStatus extends LinkedComponent {
     constructor(props) {
         super(props);
 
         this.state = {
-            packageType: "",
+            ...closedModalState,
+            selectedDeployment: {},
+            gridData: [],
+            isActive: false,
+            haschanged: false,
         };
     }
-
-    apply = (event) => {
-        event.preventDefault();
-        if (this.formIsValid()) {
-        }
-    };
-
-    formIsValid = () => {
-        return [
-            this.packageTypeLink,
-            this.nameLink,
-            this.priorityLink,
-            this.packageIdLink,
-        ].every((link) => !link.error);
-    };
 
     genericCloseClick = (eventName) => {
         const { onClose, logEvent } = this.props;
@@ -37,7 +31,124 @@ export class DeploymentStatus extends LinkedComponent {
         onClose();
     };
 
+    componentDidMount() {
+        if (this.props.selectedDeployment) {
+            this.setState({
+                isActive: this.props.selectedDeployment.isActive,
+            });
+        }
+    }
+
+    // getOpenModal = () => {
+    //     debugger;
+    //     const {
+    //         t,
+    //         deleteIsPending,
+    //         deleteError,
+    //         deleteItem,
+    //         logEvent,
+    //     } = this.props;
+    //     if (
+    //         this.state.openModalName === "delete-deployment" &&
+    //         this.props.currentDeployment
+    //     ) {
+    //         logEvent(
+    //             toSinglePropertyDiagnosticsModel(
+    //                 "DeploymentStatus_DeleteClick",
+    //                 "DeploymentId",
+    //                 this.props.currentDeployment
+    //                     ? this.props.currentDeployment.id
+    //                     : ""
+    //             )
+    //         );
+    //         return (
+    //             <DeleteModal
+    //                 t={t}
+    //                 deleteItem={deleteItem}
+    //                 error={deleteError}
+    //                 isPending={deleteIsPending}
+    //                 itemId={this.props.currentDeployment.id}
+    //                 onClose={this.closeModal}
+    //                 onDelete={this.onDelete}
+    //                 logEvent={logEvent}
+    //                 title={this.props.t("deployments.modals.delete.title")}
+    //                 deleteInfo={this.props.t("deployments.modals.delete.info", {
+    //                     deploymentName: this.props.currentDeployment.name,
+    //                 })}
+    //             />
+    //         );
+    //     }
+    //     return null;
+    // };
+
+    getOpenModal = () => {
+        console.log(this.state.openModalName);
+        const {
+            t,
+            deleteIsPending,
+            deleteError,
+            deleteItem,
+            logEvent,
+        } = this.props;
+
+        return (
+            <DeleteModal
+                t={t}
+                deleteItem={deleteItem}
+                error={deleteError}
+                isPending={deleteIsPending}
+                itemId={"1340"}
+                onClose={this.closeModal}
+                onDelete={this.onDelete}
+                logEvent={logEvent}
+                title={this.props.t("deployments.modals.delete.title")}
+                deleteInfo={this.props.t("deployments.modals.delete.info", {
+                    deploymentName: "Test Deployment",
+                })}
+            />
+        );
+    };
+
+    openModal(modalName) {
+        setTimeout(() => {
+            this.setState({
+                openModalName: modalName,
+            });
+            this.getOpenModal();
+        }, 10);
+    }
+
+    closeModal = () => this.setState(closedModalState);
+
+    onDelete = () => {
+        this.closeModal();
+        this.props.history.push("/deployments");
+    };
+
+    onDeploymentStatusChange = (updatedStatus) => {
+        setTimeout(() => {
+            if (this.state.isActive !== updatedStatus) {
+                this.setState({
+                    isActive: updatedStatus,
+                    haschanged: true,
+                });
+            }
+        }, 10);
+    };
+
+    apply = (event) => {
+        event.preventDefault();
+        if (this.state.haschanged) {
+            if (this.state.isActive) {
+                // reactivate the inactivated deployment
+            } else {
+                this.openModal("delete-deployment");
+            }
+        }
+    };
+
     render() {
+        const { hasChanged } = this.state;
         const { t } = this.props;
         return (
             <Flyout
@@ -48,10 +159,82 @@ export class DeploymentStatus extends LinkedComponent {
                 }
             >
                 <div className="new-deployment-content">
-                    <form
-                        className="new-deployment-form"
-                        onSubmit={this.apply}
-                    ></form>
+                    <div>
+                        {t("deployments.flyouts.status.deploymentLimitText")}
+                    </div>
+                    <br />
+                    {/* <h3>{this.props.selectedDeployment.name}</h3> */}
+                    <br />
+                    <Toggle
+                        className="simulation-toggle-button"
+                        name={t("this.props.selectedDeployment.name")}
+                        attr={{
+                            button: {
+                                "aria-label": t(
+                                    "settingsFlyout.simulationToggle"
+                                ),
+                                type: "button",
+                            },
+                        }}
+                        // on={this.props.selectedDeployment.isActive}
+                        on={this.state.isActive}
+                        onLabel={t("deployments.flyouts.status.active")}
+                        offLabel={t("deployments.flyouts.status.inActive")}
+                        onChange={this.onDeploymentStatusChange}
+                    />
+                    <br />
+                    <br />
+                    <form className="new-deployment-form" onSubmit={this.apply}>
+                        <div>
+                            <h3>
+                                {t(
+                                    "deployments.flyouts.status.relatedDeployment.title"
+                                )}
+                            </h3>
+                        </div>
+                        {/* <div>
+                            {this.props.relatedDeployments.length === 0 && (
+                                <div>
+                                    {t(
+                                        "deployments.flyouts.status.relatedDeployment.noRelatedDeploymentText"
+                                    )}
+                                </div>
+                            )}
+                            <ul>
+                                {this.props.relatedDeployments.map(
+                                    (deployment) => {
+                                        return (
+                                            <li>
+                                                {deployment.name}
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                                {deployment.createdDateTimeUtc}-
+                                                {deployment.createdDateTimeUtc}
+                                            </li>
+                                        );
+                                    }
+                                )}
+                            </ul>
+                        </div> */}
+                        <div>
+                            <BtnToolbar>
+                                <Btn primary={true} type="submit">
+                                    {t("deployments.flyouts.status.apply")}
+                                </Btn>
+                                <Btn
+                                    svg={svgs.cancelX}
+                                    onClick={() =>
+                                        this.genericCloseClick(
+                                            "DeploymentStatus_CloseClick"
+                                        )
+                                    }
+                                >
+                                    {hasChanged
+                                        ? t("deployments.flyouts.status.cancel")
+                                        : t("deployments.flyouts.status.close")}
+                                </Btn>
+                            </BtnToolbar>
+                        </div>
+                    </form>
                 </div>
             </Flyout>
         );
