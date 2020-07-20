@@ -5,11 +5,12 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Azure.Devices;
+using Mmm.Iot.Common.Services.Models;
 using Mmm.Iot.IoTHubManager.Services.Helpers;
 
 namespace Mmm.Iot.IoTHubManager.Services.Models
 {
-    public class DeploymentServiceModel
+    public class DeploymentServiceModel : Audit
     {
         public DeploymentServiceModel(Configuration deployment)
         {
