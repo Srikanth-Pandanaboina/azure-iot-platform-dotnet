@@ -12,7 +12,7 @@ export class DeploymentsGrid extends Component {
         super(props);
 
         this.columnDefs = [
-            deploymentsColumnDefs.icon,
+            deploymentsColumnDefs.isActive,
             deploymentsColumnDefs.name,
             deploymentsColumnDefs.package,
             deploymentsColumnDefs.deviceGroup,
@@ -29,15 +29,15 @@ export class DeploymentsGrid extends Component {
 
     render() {
         const gridProps = {
-                /* Grid Properties */
-                ...defaultDeploymentsGridProps,
-                columnDefs: translateColumnDefs(this.props.t, this.columnDefs),
-                ...this.props, // Allow default property overrides
-                getRowNodeId: ({ id }) => id,
-                context: {
-                    t: this.props.t,
-                },
-            };
+            /* Grid Properties */
+            ...defaultDeploymentsGridProps,
+            columnDefs: translateColumnDefs(this.props.t, this.columnDefs),
+            ...this.props, // Allow default property overrides
+            getRowNodeId: ({ id }) => id,
+            context: {
+                t: this.props.t,
+            },
+        };
 
         return <PcsGrid {...gridProps} />;
     }

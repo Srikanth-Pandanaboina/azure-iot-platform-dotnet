@@ -891,9 +891,15 @@
             "status":{
                 "title": "Deployment Status",
                 "relatedDeployment": {
-                    "title": "Related Deployments"
+                    "title": "Related Deployments",
+                    "noRelatedDeploymentText":"No Related deployments exist for the selected deployment."
                 },
-                "deploymentLimitText":"Your environment is currently limited to 100 active deployments." 
+                "deploymentLimitText": "Your environment is currently limited to 100 active deployments.",
+                "active": "Active",
+                "inActive": "InActive",
+                "apply": "Apply",
+                "cancel": "Cancel",
+                "close": "Close"
             }
         },
         "details": {
@@ -941,7 +947,8 @@
             "appliedTooltip": "Number of device twins that have been modified by the configuration.",
             "failed": "Failed",
             "succeeded": "Succeeded",
-            "dateCreated": "Created On"
+            "dateCreated": "Created On",
+            "status": "Status"
         }
     },
     "packages": {

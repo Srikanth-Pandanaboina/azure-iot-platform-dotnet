@@ -4,21 +4,18 @@ import Config from "app.config";
 import {
     SoftSelectLinkRenderer,
     TimeRenderer,
+    IsActiveDeploymentRenderer,
 } from "components/shared/cellRenderers";
 import { getPackageTypeTranslation, getConfigTypeTranslation } from "utilities";
-import {
-    gridValueFormatters,
-    SMALL_GREEN_CIRCLE,
-    SMALL_RED_CIRCLE,
-} from "components/shared/pcsGrid/pcsGridConfig";
+import { gridValueFormatters } from "components/shared/pcsGrid/pcsGridConfig";
 
 const { checkForEmpty } = gridValueFormatters;
 
 export const deploymentsColumnDefs = {
-    icon: {
-        field: "name",
-        cellClass: ({ value }) =>
-            value === "Version2.0" ? SMALL_GREEN_CIRCLE : SMALL_RED_CIRCLE,
+    isActive: {
+        headerName: "deployments.grid.status",
+        field: "isActive",
+        cellRendererFramework: IsActiveDeploymentRenderer,
     },
     name: {
         headerName: "deployments.grid.name",

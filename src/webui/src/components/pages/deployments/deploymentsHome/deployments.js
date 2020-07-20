@@ -87,6 +87,12 @@ export class Deployments extends Component {
     onRowClicked = (selectedDeployment) => {
         this.setState({
             openFlyoutName: "deployment-status",
+            deployment: selectedDeployment.data,
+            relatedDeployments: selectedDeployment.node.gridOptionsWrapper.gridOptions.rowData.filter(
+                (x) =>
+                    x.deviceGroupId === selectedDeployment.data.deviceGroupId &&
+                    x.id !== selectedDeployment.data.id
+            ),
         });
     };
 
@@ -105,7 +111,7 @@ export class Deployments extends Component {
                 onContextMenuChange: this.onContextMenuChange,
                 t: t,
                 getSoftSelectId: this.getSoftSelectId,
-                onSoftSelectChange: this.onSoftSelectChange,                
+                onSoftSelectChange: this.onSoftSelectChange,
                 onRowClicked: this.onRowClicked,
             };
 
@@ -157,6 +163,8 @@ export class Deployments extends Component {
                     )}
                     {this.state.openFlyoutName === "deployment-status" && (
                         <DeploymentStatusContainer
+                            selectedDeployment={this.state.deployment}
+                            relatedDeployments={this.state.relatedDeployments}
                             t={t}
                             onClose={this.closeFlyout}
                         />
