@@ -619,6 +619,13 @@ namespace Mmm.Iot.IoTHubManager.Services
 
                 AuditHelper.UpdateAuditingData(existingDeployment, userId);
 
+                if (existingDeployment.Tags.Contains("reserved.latest", StringComparer.InvariantCultureIgnoreCase))
+                {
+                    existingDeployment.Tags.Remove("reserved.latest");
+                }
+
+                AuditHelper.UpdateAuditingData(existingDeployment, userId);
+
                 var value = JsonConvert.SerializeObject(
                     existingDeployment,
                     Formatting.Indented,
@@ -668,6 +675,24 @@ namespace Mmm.Iot.IoTHubManager.Services
                                                                             });
                                     await this.client.UpdateAsync(DeploymentsCollection, latestDeployment.Id, storageValue, latestDeploymentFromStorage.ETag);
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+
+                            if (!latestDeploymentFromStorage.Tags.Contains("reserved.latest"))
+                            {
+                                latestDeploymentFromStorage.Tags.Add("reserved.latest");
+
+                                var storageValue = JsonConvert.SerializeObject(
+                                                                        latestDeploymentFromStorage,
+                                                                        Formatting.Indented,
+                                                                        new JsonSerializerSettings
+                                                                        {
+                                                                            NullValueHandling = NullValueHandling.Ignore,
+                                                                        });
+                                await this.client.UpdateAsync(DeploymentsCollection, deploymentId, storageValue, existingDeployment.ETag);
                             }
                         }
                     }
