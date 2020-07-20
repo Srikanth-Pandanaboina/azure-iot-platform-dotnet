@@ -4,89 +4,28 @@ import { connect } from "react-redux";
 import { withNamespaces } from "react-i18next";
 import { DeploymentStatus } from "./deploymentStatus";
 import {
-    getCreateDeploymentError,
-    getCreateDeploymentPendingStatus,
-    getLastItemId,
+    getDeleteDeploymentError,
+    getDeleteDeploymentPendingStatus,
     epics as deploymentsEpics,
     redux as deploymentsRedux,
 } from "store/reducers/deploymentsReducer";
-import {
-    getPackages,
-    getPackagesPendingStatus,
-    getPackagesError,
-    epics as packagesEpics,
-    redux as packagesRedux,
-    getConfigTypes,
-    getConfigTypesError,
-    getConfigTypesPendingStatus,
-} from "store/reducers/packagesReducer";
-import {
-    getDeviceGroups,
-    getActiveDeviceGroupId,
-    epics as appEpics,
-} from "store/reducers/appReducer";
-import {
-    getDevices,
-    getDevicesByConditionError,
-    getDevicesByConditionPendingStatus,
-    epics as devicesEpics,
-    redux as devicesRedux,
-} from "store/reducers/devicesReducer";
+import { epics as appEpics } from "store/reducers/appReducer";
 
 // Pass the global info needed
 const mapStateToProps = (state) => ({
-        packages: getPackages(state),
-        packagesPending: getPackagesPendingStatus(state),
-        packagesError: getPackagesError(state),
-        deviceGroups: getDeviceGroups(state),
-        deviceGroupId: getActiveDeviceGroupId(state),
-        devices: getDevices(state),
-        devicesPending: getDevicesByConditionPendingStatus(state),
-        devicesError: getDevicesByConditionError(state),
-        createIsPending: getCreateDeploymentPendingStatus(state),
-        createError: getCreateDeploymentError(state),
-        createdDeploymentId: getLastItemId(state),
-        configTypes: getConfigTypes(state),
-        configTypesError: getConfigTypesError(state),
-        configTypesIsPending: getConfigTypesPendingStatus(state),
+        deleteIsPending: getDeleteDeploymentPendingStatus(state),
+        deleteError: getDeleteDeploymentError(state),
     }),
     // Wrap the dispatch methods
     mapDispatchToProps = (dispatch) => ({
-        createDeployment: (deploymentModel) =>
-            dispatch(
-                deploymentsEpics.actions.createDeployment(deploymentModel)
-            ),
-        resetCreatePendingError: () =>
-            dispatch(
-                deploymentsRedux.actions.resetPendingAndError(
-                    deploymentsEpics.actions.createDeployment
-                )
-            ),
-        fetchPackages: (packageType, configType) =>
-            dispatch(
-                packagesEpics.actions.fetchFilteredPackages({
-                    packageType,
-                    configType,
-                })
-            ),
-        resetPackagesPendingError: () =>
-            dispatch(
-                packagesRedux.actions.resetPendingAndError(
-                    packagesEpics.actions.fetchPackages
-                )
-            ),
-        fetchDevices: (condition) =>
-            dispatch(devicesEpics.actions.fetchDevices()),
-        resetDevicesPendingError: () =>
-            dispatch(
-                devicesRedux.actions.resetPendingAndError(
-                    devicesEpics.actions.fetchDevicesByCondition
-                )
-            ),
+        fetchDeployment: (id) =>
+            dispatch(deploymentsEpics.actions.fetchDeployment(id)),
+        resetDeployedDevices: () =>
+            dispatch(deploymentsRedux.actions.resetDeployedDevices()),
+        deleteItem: (deploymentId) =>
+            dispatch(deploymentsEpics.actions.deleteDeployment(deploymentId)),
         logEvent: (diagnosticsModel) =>
             dispatch(appEpics.actions.logEvent(diagnosticsModel)),
-        fetchConfigTypes: () =>
-            dispatch(packagesEpics.actions.fetchConfigTypes()),
     });
 
 export const DeploymentStatusContainer = withNamespaces()(
