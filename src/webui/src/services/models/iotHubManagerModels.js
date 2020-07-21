@@ -237,6 +237,8 @@ export const toDeploymentModel = (deployment = {}) => {
         configType: "configType",
         createdDateTimeUtc: "createdDateTimeUtc",
         isActive: "isActive",
+        modifiedBy: "modifiedBy",
+        modifiedDate: "modifiedDate",
         "metrics.systemMetrics.appliedCount": "appliedCount",
         "metrics.systemMetrics.reportedFailedCount": "failedCount",
         "metrics.systemMetrics.reportedSuccessfulCount": "succeededCount",
@@ -266,6 +268,10 @@ export const toDeploymentRequestModel = (deploymentModel = {}) => ({
     PackageType: deploymentModel.packageType,
     ConfigType: deploymentModel.configType,
     IsActive: deploymentModel.IsActive,
+    CreatedBy: deploymentModel.CreatedBy,
+    CreatedDate: deploymentModel.CreatedDate,
+    ModifiedBy: deploymentModel.ModifiedBy,
+    ModifiedDate: deploymentModel.ModifiedDate,
 });
 
 export const toEdgeAgentModel = (edgeAgent = {}) =>

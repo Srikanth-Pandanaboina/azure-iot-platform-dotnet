@@ -8,16 +8,11 @@ import { Toggle } from "@microsoft/azure-iot-ux-fluent-controls/lib/components/T
 
 import "./deploymentStatus.scss";
 
-const closedModalState = {
-    openModalName: undefined,
-};
-
 export class DeploymentStatus extends LinkedComponent {
     constructor(props) {
         super(props);
 
         this.state = {
-            ...closedModalState,
             selectedDeployment: {},
             gridData: [],
             isActive: false,
@@ -39,87 +34,6 @@ export class DeploymentStatus extends LinkedComponent {
         }
     }
 
-    // getOpenModal = () => {
-    //     debugger;
-    //     const {
-    //         t,
-    //         deleteIsPending,
-    //         deleteError,
-    //         deleteItem,
-    //         logEvent,
-    //     } = this.props;
-    //     if (
-    //         this.state.openModalName === "delete-deployment" &&
-    //         this.props.currentDeployment
-    //     ) {
-    //         logEvent(
-    //             toSinglePropertyDiagnosticsModel(
-    //                 "DeploymentStatus_DeleteClick",
-    //                 "DeploymentId",
-    //                 this.props.currentDeployment
-    //                     ? this.props.currentDeployment.id
-    //                     : ""
-    //             )
-    //         );
-    //         return (
-    //             <DeleteModal
-    //                 t={t}
-    //                 deleteItem={deleteItem}
-    //                 error={deleteError}
-    //                 isPending={deleteIsPending}
-    //                 itemId={this.props.currentDeployment.id}
-    //                 onClose={this.closeModal}
-    //                 onDelete={this.onDelete}
-    //                 logEvent={logEvent}
-    //                 title={this.props.t("deployments.modals.delete.title")}
-    //                 deleteInfo={this.props.t("deployments.modals.delete.info", {
-    //                     deploymentName: this.props.currentDeployment.name,
-    //                 })}
-    //             />
-    //         );
-    //     }
-    //     return null;
-    // };
-
-    getOpenModal = () => {
-        console.log(this.state.openModalName);
-        const {
-            t,
-            deleteIsPending,
-            deleteError,
-            deleteItem,
-            logEvent,
-        } = this.props;
-
-        return (
-            <DeleteModal
-                t={t}
-                deleteItem={deleteItem}
-                error={deleteError}
-                isPending={deleteIsPending}
-                itemId={"1340"}
-                onClose={this.closeModal}
-                onDelete={this.onDelete}
-                logEvent={logEvent}
-                title={this.props.t("deployments.modals.delete.title")}
-                deleteInfo={this.props.t("deployments.modals.delete.info", {
-                    deploymentName: "Test Deployment",
-                })}
-            />
-        );
-    };
-
-    openModal(modalName) {
-        setTimeout(() => {
-            this.setState({
-                openModalName: modalName,
-            });
-            this.getOpenModal();
-        }, 10);
-    }
-
-    closeModal = () => this.setState(closedModalState);
-
     onDelete = () => {
         this.closeModal();
         this.props.history.push("/deployments");
@@ -140,9 +54,11 @@ export class DeploymentStatus extends LinkedComponent {
         event.preventDefault();
         if (this.state.haschanged) {
             if (this.state.isActive) {
-                // reactivate the inactivated deployment
+                this.props.reactivateDeployment(
+                    this.props.selectedDeployment.id
+                );
             } else {
-                this.openModal("delete-deployment");
+                this.props.deleteItem(this.props.selectedDeployment.id);
             }
         }
     };
@@ -163,7 +79,7 @@ export class DeploymentStatus extends LinkedComponent {
                         {t("deployments.flyouts.status.deploymentLimitText")}
                     </div>
                     <br />
-                    {/* <h3>{this.props.selectedDeployment.name}</h3> */}
+                    <h3>{this.props.selectedDeployment.name}</h3>
                     <br />
                     <Toggle
                         className="simulation-toggle-button"
@@ -192,7 +108,7 @@ export class DeploymentStatus extends LinkedComponent {
                                 )}
                             </h3>
                         </div>
-                        {/* <div>
+                        <div>
                             {this.props.relatedDeployments.length === 0 && (
                                 <div>
                                     {t(
@@ -204,20 +120,28 @@ export class DeploymentStatus extends LinkedComponent {
                                 {this.props.relatedDeployments.map(
                                     (deployment) => {
                                         return (
-                                            <li>
+                                            <li key={deployment.id}>
                                                 {deployment.name}
                                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                                {deployment.createdDateTimeUtc}-
-                                                {deployment.createdDateTimeUtc}
+                                                {
+                                                    deployment.createdDateTimeUtc
+                                                }{" "}
+                                                &nbsp;-&nbsp;
+                                                {deployment.modifiedDate}
+                                                <br />
                                             </li>
                                         );
                                     }
                                 )}
                             </ul>
-                        </div> */}
+                        </div>
                         <div>
                             <BtnToolbar>
-                                <Btn primary={true} type="submit">
+                                <Btn
+                                    primary={true}
+                                    type="submit"
+                                    disabled={!this.state.haschanged}
+                                >
                                     {t("deployments.flyouts.status.apply")}
                                 </Btn>
                                 <Btn
