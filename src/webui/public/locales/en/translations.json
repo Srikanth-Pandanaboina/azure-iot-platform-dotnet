@@ -899,7 +899,8 @@
                 "inActive": "InActive",
                 "apply": "Apply",
                 "cancel": "Cancel",
-                "close": "Close"
+                "close": "Close",
+                "updating": "Updating Deployment"
             }
         },
         "details": {
