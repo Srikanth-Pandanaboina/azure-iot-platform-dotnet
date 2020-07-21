@@ -948,7 +948,9 @@
             "failed": "Failed",
             "succeeded": "Succeeded",
             "dateCreated": "Created On",
-            "status": "Status"
+            "status": "Status",
+            "lastModifiedBy":"Last Modified By",
+            "lastModifiedDate":"Last Modified Date"
         }
     },
     "packages": {

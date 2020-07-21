@@ -78,6 +78,16 @@ export const deploymentsColumnDefs = {
         sort: "desc",
         cellRendererFramework: TimeRenderer,
     },
+    lastModifiedBy: {        
+        headerName: "deployments.grid.lastModifiedBy",
+        field: "modifiedBy",
+        valueFormatter: ({ value }) => checkForEmpty(value),
+    },
+    lastModifiedDate: {        
+        headerName: "deployments.grid.lastModifiedDate",
+        field: "modifiedDate",
+        cellRendererFramework: TimeRenderer,
+    },
 };
 
 export const defaultDeploymentsGridProps = {
