@@ -46,7 +46,6 @@ export class DeploymentStatus extends LinkedComponent {
     }
 
     componentWillReceiveProps(nextprops){
-        
         this.setState({
             isActive: nextprops.selectedDeployment.isActive,
         });
