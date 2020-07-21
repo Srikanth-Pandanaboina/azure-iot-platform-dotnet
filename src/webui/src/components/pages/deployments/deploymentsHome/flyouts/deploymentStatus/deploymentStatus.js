@@ -175,7 +175,6 @@ export class DeploymentStatus extends LinkedComponent {
     };
 
     render() {
-        const { hasChanged } = this.state;
         const { t } = this.props;
         const { changesApplied } = this.state;
         return (
@@ -261,7 +260,10 @@ export class DeploymentStatus extends LinkedComponent {
                                 <Btn
                                     primary={true}
                                     type="submit"
-                                    disabled={!this.state.haschanged}
+                                    disabled={
+                                        !!changesApplied &&
+                                        !this.state.haschanged
+                                    }
                                 >
                                     {t("deployments.flyouts.status.apply")}
                                 </Btn>
