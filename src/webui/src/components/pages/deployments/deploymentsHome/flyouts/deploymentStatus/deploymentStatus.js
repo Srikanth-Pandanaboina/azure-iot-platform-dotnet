@@ -260,9 +260,7 @@ export class DeploymentStatus extends LinkedComponent {
                                 <Btn
                                     primary={true}
                                     type="submit"
-                                    disabled={
-                                        !this.state.haschanged
-                                    }
+                                    disabled={!this.state.haschanged}
                                 >
                                     {t("deployments.flyouts.status.apply")}
                                 </Btn>
