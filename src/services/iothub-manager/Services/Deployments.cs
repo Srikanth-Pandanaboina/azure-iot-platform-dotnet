@@ -590,6 +590,13 @@ namespace Mmm.Iot.IoTHubManager.Services
             return output;
         }
 
+        private TwinServiceModel CreateTwinServiceModel(ValueApiModel response)
+        {
+            var output = JsonConvert.DeserializeObject<TwinServiceModel>(response.Data);
+            output.ETag = response.ETag;
+            return output;
+        }
+
         private async Task<DeploymentServiceModel> MarkDeploymentAsInactive(DeploymentServiceModel existingDeployment, string userId, List<TwinServiceModel> deviceTwins, bool isDelete)
         {
             if (existingDeployment != null)
@@ -768,6 +775,48 @@ namespace Mmm.Iot.IoTHubManager.Services
         }
 
         private async Task<List<TwinServiceModel>> GetDeviceProperties(IEnumerable<string> deviceIds)
+        {
+            List<TwinServiceModel> twins = null;
+            DeviceServiceListModel devices = null;
+            string deviceQuery = @"deviceId IN [{0}]";
+
+            if (deviceIds != null && deviceIds.Count() > 0)
+            {
+                var deviceIdsQuery = string.Join(",", deviceIds.Select(d => $"'{d}'"));
+                var query = string.Format(deviceQuery, deviceIdsQuery);
+
+                devices = await this.devices.GetListAsync(query, null);
+                if (devices != null && devices.Items.Count() > 0)
+                {
+                    twins = new List<TwinServiceModel>();
+
+                    twins.AddRange(devices.Items.Select(i => i.Twin));
+                }
+            }
+
+            return twins;
+        }
+
+        private async Task StoreDevicePropertiesInStorage(List<TwinServiceModel> deviceTwins, string deploymentId)
+        {
+            if (deviceTwins != null)
+            {
+                foreach (var deviceTwin in deviceTwins)
+                {
+                    var value = JsonConvert.SerializeObject(
+                        deviceTwin,
+                        Formatting.Indented,
+                        new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                        });
+
+                    await this.client.CreateAsync(string.Format(DeploymentDevicePropertiesCollection, deploymentId), value);
+                }
+            }
+        }
+
+        private async Task<List<TwinServiceModel>> UpdateDevicePropertiesInStorage(IEnumerable<string> deviceIds)
         {
             List<TwinServiceModel> twins = null;
             DeviceServiceListModel devices = null;
