@@ -24,8 +24,10 @@ const mapStateToProps = (state) => ({
             dispatch(deploymentsRedux.actions.resetDeployedDevices()),
         deleteItem: (deploymentId) =>
             dispatch(deploymentsEpics.actions.deleteDeployment(deploymentId)),
-        reactivateDeployment: (deploymentId) => 
-            dispatch(deploymentsEpics.actions.reactivateDeployment(deploymentId)),
+        reactivateDeployment: (deploymentId) =>
+            dispatch(
+                deploymentsEpics.actions.reactivateDeployment(deploymentId)
+            ),
         logEvent: (diagnosticsModel) =>
             dispatch(appEpics.actions.logEvent(diagnosticsModel)),
     });

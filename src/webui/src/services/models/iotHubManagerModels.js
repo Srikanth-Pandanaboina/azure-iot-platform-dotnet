@@ -239,12 +239,20 @@ export const toDeploymentModel = (deployment = {}) => {
         isActive: "isActive",
         modifiedBy: "modifiedBy",
         modifiedDate: "modifiedDate",
+        createdBy: "createdBy",
+        createdDate: "createdDate",
         "metrics.systemMetrics.appliedCount": "appliedCount",
         "metrics.systemMetrics.reportedFailedCount": "failedCount",
         "metrics.systemMetrics.reportedSuccessfulCount": "succeededCount",
         "metrics.systemMetrics.targetedCount": "targetedCount",
         "metrics.systemMetrics.pendingCount": "pendingCount",
     });
+
+    modelData.modifiedBy = modelData.modifiedBy || modelData.createdBy;
+    modelData.modifiedDate =
+        modelData.modifiedDate ||
+        modelData.createdDate ||
+        modelData.createdDateTimeUtc;
     return update(modelData, {
         deviceStatuses: {
             $set: dot.pick("Metrics.DeviceStatuses", deployment),
