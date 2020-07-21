@@ -2,11 +2,18 @@
 
 import React from "react";
 import { toDiagnosticsModel } from "services/models";
-import { svgs, LinkedComponent } from "utilities";
-import { BtnToolbar, Btn, Flyout, DeleteModal } from "components/shared";
+import { svgs, LinkedComponent, formatDate } from "utilities";
+import {
+    BtnToolbar,
+    Btn,
+    Flyout,
+    Indicator,
+    ComponentArray,
+} from "components/shared";
 import { Toggle } from "@microsoft/azure-iot-ux-fluent-controls/lib/components/Toggle";
 
 import "./deploymentStatus.scss";
+import { IoTHubManagerService } from "services";
 
 export class DeploymentStatus extends LinkedComponent {
     constructor(props) {
@@ -17,7 +24,11 @@ export class DeploymentStatus extends LinkedComponent {
             gridData: [],
             isActive: false,
             haschanged: false,
+            changesApplied: false,
         };
+        this.activateOrInactivateDeployment = this.activateOrInactivateDeployment.bind(
+            this
+        );
     }
 
     genericCloseClick = (eventName) => {
@@ -34,11 +45,6 @@ export class DeploymentStatus extends LinkedComponent {
         }
     }
 
-    onDelete = () => {
-        this.closeModal();
-        this.props.history.push("/deployments");
-    };
-
     onDeploymentStatusChange = (updatedStatus) => {
         setTimeout(() => {
             if (this.state.isActive !== updatedStatus) {
@@ -53,19 +59,33 @@ export class DeploymentStatus extends LinkedComponent {
     apply = (event) => {
         event.preventDefault();
         if (this.state.haschanged) {
-            if (this.state.isActive) {
-                this.props.reactivateDeployment(
-                    this.props.selectedDeployment.id
-                );
-            } else {
-                this.props.deleteItem(this.props.selectedDeployment.id);
-            }
+            this.activateOrInactivateDeployment(
+                this.props.selectedDeployment.id
+            );
         }
     };
 
+    activateOrInactivateDeployment(deploymentId) {
+        this.setState({ changesApplied: true });
+        if (this.state.isActive) {
+            IoTHubManagerService.reactivateDeployment(
+                deploymentId
+            ).subscribe(() => this.postUpdatingDeployment());
+        } else {
+            IoTHubManagerService.deleteDeployment(deploymentId).subscribe(() =>
+                this.postUpdatingDeployment()
+            );
+        }
+    }
+
+    postUpdatingDeployment() {
+        this.genericCloseClick("DeploymentStatus_CloseClick");
+        this.setState({ changesApplied: false });
+    }
+
     render() {
-        const { hasChanged } = this.state;
         const { t } = this.props;
+        const { changesApplied } = this.state;
         return (
             <Flyout
                 header={t("deployments.flyouts.status.title")}
@@ -75,32 +95,33 @@ export class DeploymentStatus extends LinkedComponent {
                 }
             >
                 <div className="new-deployment-content">
-                    <div>
-                        {t("deployments.flyouts.status.deploymentLimitText")}
-                    </div>
-                    <br />
-                    <h3>{this.props.selectedDeployment.name}</h3>
-                    <br />
-                    <Toggle
-                        className="simulation-toggle-button"
-                        name={t("this.props.selectedDeployment.name")}
-                        attr={{
-                            button: {
-                                "aria-label": t(
-                                    "settingsFlyout.simulationToggle"
-                                ),
-                                type: "button",
-                            },
-                        }}
-                        // on={this.props.selectedDeployment.isActive}
-                        on={this.state.isActive}
-                        onLabel={t("deployments.flyouts.status.active")}
-                        offLabel={t("deployments.flyouts.status.inActive")}
-                        onChange={this.onDeploymentStatusChange}
-                    />
-                    <br />
-                    <br />
                     <form className="new-deployment-form" onSubmit={this.apply}>
+                        <div>
+                            {t(
+                                "deployments.flyouts.status.deploymentLimitText"
+                            )}
+                        </div>
+                        <br />
+                        <h3>{this.props.selectedDeployment.name}</h3>
+                        <br />
+                        <Toggle
+                            className="simulation-toggle-button"
+                            name={t("this.props.selectedDeployment.name")}
+                            attr={{
+                                button: {
+                                    "aria-label": t(
+                                        "settingsFlyout.simulationToggle"
+                                    ),
+                                    type: "button",
+                                },
+                            }}
+                            on={this.state.isActive}
+                            onLabel={t("deployments.flyouts.status.active")}
+                            offLabel={t("deployments.flyouts.status.inActive")}
+                            onChange={this.onDeploymentStatusChange}
+                        />
+                        <br />
+                        <br />
                         <div>
                             <h3>
                                 {t(
@@ -124,10 +145,10 @@ export class DeploymentStatus extends LinkedComponent {
                                                 {deployment.name}
                                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                                 {
-                                                    deployment.createdDateTimeUtc
+                                                    formatDate(deployment.createdDateTimeUtc)
                                                 }{" "}
                                                 &nbsp;-&nbsp;
-                                                {deployment.modifiedDate}
+                                                {formatDate(deployment.modifiedDate)}
                                                 <br />
                                             </li>
                                         );
@@ -135,12 +156,21 @@ export class DeploymentStatus extends LinkedComponent {
                                 )}
                             </ul>
                         </div>
+                        {!!changesApplied && (
+                            <ComponentArray>
+                                <Indicator />
+                                {t("deployments.flyouts.status.updating")}
+                            </ComponentArray>
+                        )}
                         <div>
                             <BtnToolbar>
                                 <Btn
                                     primary={true}
                                     type="submit"
-                                    disabled={!this.state.haschanged}
+                                    disabled={
+                                        !!changesApplied &&
+                                        !this.state.haschanged
+                                    }
                                 >
                                     {t("deployments.flyouts.status.apply")}
                                 </Btn>
@@ -152,7 +182,7 @@ export class DeploymentStatus extends LinkedComponent {
                                         )
                                     }
                                 >
-                                    {hasChanged
+                                    {this.state.hasChanged
                                         ? t("deployments.flyouts.status.cancel")
                                         : t("deployments.flyouts.status.close")}
                                 </Btn>

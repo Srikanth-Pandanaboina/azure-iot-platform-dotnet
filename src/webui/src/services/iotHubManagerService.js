@@ -88,8 +88,9 @@ export class IoTHubManagerService {
 
     /** Returns deployments */
     static getDeployments() {
-        return HttpClient.get(`${ENDPOINT}deployments/getAll`
-        ).map(toDeploymentsModel);
+        return HttpClient.get(`${ENDPOINT}deployments/getAll`).map(
+            toDeploymentsModel
+        );
     }
 
     /** Returns deployment */
@@ -126,7 +127,7 @@ export class IoTHubManagerService {
         return HttpClient.delete(`${ENDPOINT}deployments/${id}`).map(() => id);
     }
 
-    static reactivateDeployment(id){
+    static reactivateDeployment(id) {
         return HttpClient.put(`${ENDPOINT}deployments/${id}`).map(() => id);
     }
 
