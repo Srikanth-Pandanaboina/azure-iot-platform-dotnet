@@ -38,6 +38,7 @@ namespace Mmm.Iot.IoTHubManager.WebService.Models
             this.PackageType = serviceModel.PackageType;
             this.ConfigType = serviceModel.ConfigType;
             this.IsActive = !(serviceModel.Tags != null && serviceModel.Tags.Contains("reserved.inactive"));
+            this.IsLatest = serviceModel.Tags != null && serviceModel.Tags.Contains("reserved.latest");
             this.Metrics = new DeploymentMetricsApiModel(serviceModel.DeploymentMetrics)
             {
                 DeviceStatuses = serviceModel.DeploymentMetrics?.DeviceStatuses,
@@ -101,6 +102,9 @@ namespace Mmm.Iot.IoTHubManager.WebService.Models
 
         [JsonProperty("IsActive")]
         public bool IsActive { get; set; }
+
+        [JsonProperty("IsLatest")]
+        public bool IsLatest { get; set; }
 
         public DeploymentServiceModel ToServiceModel()
         {
