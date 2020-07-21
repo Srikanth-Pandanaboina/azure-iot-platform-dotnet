@@ -699,7 +699,7 @@ namespace Mmm.Iot.IoTHubManager.Services
                                                                         {
                                                                             NullValueHandling = NullValueHandling.Ignore,
                                                                         });
-                                await this.client.UpdateAsync(DeploymentsCollection, deploymentId, storageValue, existingDeployment.ETag);
+                                await this.client.UpdateAsync(DeploymentsCollection, latestDeployment.Id, storageValue, latestDeploymentFromStorage.ETag);
                             }
                         }
                     }
