@@ -88,7 +88,8 @@ export class IoTHubManagerService {
 
     /** Returns deployments */
     static getDeployments() {
-        return HttpClient.get(`${ENDPOINT}deployments`).map(toDeploymentsModel);
+        return HttpClient.get(`${ENDPOINT}deployments/getAll`
+        ).map(toDeploymentsModel);
     }
 
     /** Returns deployment */
@@ -140,6 +141,10 @@ export class IoTHubManagerService {
             {},
             { timeout: 120000 }
         );
+    }
+
+    static reactivateDeployment(id){
+        return HttpClient.put(`${ENDPOINT}deployments/${id}`).map(() => id);
     }
 
     /** Returns deployments */

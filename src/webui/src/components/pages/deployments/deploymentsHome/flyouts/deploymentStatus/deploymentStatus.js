@@ -15,10 +15,6 @@ import { Toggle } from "@microsoft/azure-iot-ux-fluent-controls/lib/components/T
 import "./deploymentStatus.scss";
 import { IoTHubManagerService } from "services";
 
-const closedModalState = {
-    openModalName: undefined,
-};
-
 export class DeploymentStatus extends LinkedComponent {
     constructor(props) {
         super(props);
@@ -169,9 +165,11 @@ export class DeploymentStatus extends LinkedComponent {
         event.preventDefault();
         if (this.state.haschanged) {
             if (this.state.isActive) {
-                // reactivate the inactivated deployment
+                this.props.reactivateDeployment(
+                    this.props.selectedDeployment.id
+                );
             } else {
-                this.openModal("delete-deployment");
+                this.props.deleteItem(this.props.selectedDeployment.id);
             }
         }
     };
