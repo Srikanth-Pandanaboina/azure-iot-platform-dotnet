@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Documents;
 using Microsoft.Extensions.Logging;
@@ -44,11 +45,13 @@ namespace Mmm.Iot.IoTHubManager.Services
         private const string FailedQueryName = "error";
         private const string SuccessQueryName = "current";
         private const string DeploymentsCollection = "deployments";
+        private const string DeploymentDevicePropertiesCollection = "deploymentdevices-{0}";
         private readonly ILogger logger;
         private readonly IDeploymentEventLog deploymentLog;
         private readonly ITenantConnectionHelper tenantHelper;
         private readonly IConfigClient configClient;
         private readonly IStorageAdapterClient client;
+        private readonly IDevices devices;
 
         public Deployments(
             AppConfig config,
@@ -56,7 +59,8 @@ namespace Mmm.Iot.IoTHubManager.Services
             IDeploymentEventLog deploymentLog,
             ITenantConnectionHelper tenantConnectionHelper,
             IConfigClient packagesConfigClient,
-            IStorageAdapterClient client)
+            IStorageAdapterClient client,
+            IDevices devices)
         {
             if (config == null)
             {
@@ -68,6 +72,7 @@ namespace Mmm.Iot.IoTHubManager.Services
             this.logger = logger;
             this.configClient = packagesConfigClient;
             this.client = client;
+            this.devices = devices;
         }
 
         public Deployments(ITenantConnectionHelper tenantHelper)
@@ -264,6 +269,38 @@ namespace Mmm.Iot.IoTHubManager.Services
             await this.MarkDeploymentAsActive(deploymentId, userId);
         }
 
+        public async Task<DeviceServiceListModel> GetDeviceListAsync(string deploymentId, string query, bool isLatest)
+        {
+            var devices = await this.devices.GetListAsync(query, null);
+
+            if (!isLatest)
+            {
+                var deviceTwinProperties = await this.GetDeploymentDevicesAsync(deploymentId);
+                if (deviceTwinProperties != null && deviceTwinProperties.Items.Count > 0)
+                {
+                    devices.Items.ForEach(item =>
+                    {
+                        item.Twin = deviceTwinProperties.Items.FirstOrDefault(i => i.DeviceId == item.Id);
+                    });
+                }
+            }
+
+            return devices;
+        }
+
+        private async Task<TwinServiceListModel> GetDeploymentDevicesAsync(string deploymentId)
+        {
+            IEnumerable<TwinServiceModel> deploymentImpactedDevices = null;
+            var response = await this.client.GetAllAsync(string.Format(DeploymentDevicePropertiesCollection, deploymentId));
+
+            if (response != null && response.Items.Count > 0)
+            {
+                deploymentImpactedDevices = response.Items.Select(this.CreateTwinServiceModel);
+            }
+
+            return new TwinServiceListModel(deploymentImpactedDevices?.ToList());
+        }
+
         private bool CheckIfDeploymentWasMadeByRM(Configuration conf)
         {
             return conf.Labels != null &&
@@ -417,6 +454,8 @@ namespace Mmm.Iot.IoTHubManager.Services
 
                     currentDeployment.DeploymentMetrics.DeviceStatuses = this.GetDeviceStatuses(deploymentDetails);
 
+                    var deviceTwins = await this.UpdateDevicePropertiesInStorage(currentDeployment.DeploymentMetrics.DeviceStatuses.Keys);
+
                     // Since the deployment that will be created have highest priority, remove latest tag on current deployment
                     if (currentDeployment?.Tags != null)
                     {
@@ -436,6 +475,8 @@ namespace Mmm.Iot.IoTHubManager.Services
                         });
 
                     await this.client.UpdateAsync(DeploymentsCollection, currentDeployment.Id, value, currentDeployment.ETag);
+
+                    await this.StoreDevicePropertiesInStorage(deviceTwins, currentDeployment.Id);
 
                     // Since the deployment that will be created have highest priority, mark it as the latest
                     return true;
@@ -488,6 +529,13 @@ namespace Mmm.Iot.IoTHubManager.Services
                 output.Tags = new List<string>();
             }
 
+            return output;
+        }
+
+        private TwinServiceModel CreateTwinServiceModel(ValueApiModel response)
+        {
+            var output = JsonConvert.DeserializeObject<TwinServiceModel>(response.Data);
+            output.ETag = response.ETag;
             return output;
         }
 
@@ -608,6 +656,48 @@ namespace Mmm.Iot.IoTHubManager.Services
             }
 
             return new DeploymentServiceListModel(deployments?.ToList());
+        }
+
+        private async Task<List<TwinServiceModel>> UpdateDevicePropertiesInStorage(IEnumerable<string> deviceIds)
+        {
+            List<TwinServiceModel> twins = null;
+            DeviceServiceListModel devices = null;
+            string deviceQuery = @"deviceId IN [{0}]";
+
+            if (deviceIds != null && deviceIds.Count() > 0)
+            {
+                var deviceIdsQuery = string.Join(",", deviceIds.Select(d => $"'{d}'"));
+                var query = string.Format(deviceQuery, deviceIdsQuery);
+
+                devices = await this.devices.GetListAsync(query, null);
+                if (devices != null && devices.Items.Count() > 0)
+                {
+                    twins = new List<TwinServiceModel>();
+
+                    twins.AddRange(devices.Items.Select(i => i.Twin));
+                }
+            }
+
+            return twins;
+        }
+
+        private async Task StoreDevicePropertiesInStorage(List<TwinServiceModel> deviceTwins, string deploymentId)
+        {
+            if (deviceTwins != null)
+            {
+                foreach (var deviceTwin in deviceTwins)
+                {
+                    var value = JsonConvert.SerializeObject(
+                        deviceTwin,
+                        Formatting.Indented,
+                        new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                        });
+
+                    await this.client.CreateAsync(string.Format(DeploymentDevicePropertiesCollection, deploymentId), value);
+                }
+            }
         }
     }
 }

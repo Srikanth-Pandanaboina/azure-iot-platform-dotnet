@@ -192,7 +192,8 @@ namespace Mmm.Iot.IoTHubManager.Services.Test
                 new Mock<IDeploymentEventLog>().Object,
                 this.tenantHelper.Object,
                 this.packageConfigClient.Object,
-                this.storageAdapterClient.Object);
+                this.storageAdapterClient.Object,
+                null);
         }
 
         [Theory]
