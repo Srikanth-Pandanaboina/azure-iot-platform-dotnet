@@ -200,10 +200,11 @@ namespace Mmm.Iot.IoTHubManager.Services
                 return new DeploymentServiceModel(deployment)
                 {
                     DeploymentMetrics =
-                {
-                    DeviceMetrics = this.CalculateDeviceMetrics(deviceStatuses),
-                    DeviceStatuses = includeDeviceStatus ? deviceStatuses : null,
-                },
+                    {
+                        DeviceMetrics = this.CalculateDeviceMetrics(deviceStatuses),
+                        DeviceStatuses = includeDeviceStatus ? deviceStatuses : null,
+                    },
+                    Tags = new List<string>() { "reserved.latest" },
                 };
             }
             else

@@ -45,7 +45,7 @@ export class DeploymentStatus extends LinkedComponent {
         }
     }
 
-    componentWillReceiveProps(nextprops){
+    componentWillReceiveProps(nextprops) {
         this.setState({
             isActive: nextprops.selectedDeployment.isActive,
         });
@@ -150,11 +150,13 @@ export class DeploymentStatus extends LinkedComponent {
                                             <li key={deployment.id}>
                                                 {deployment.name}
                                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                                {
-                                                    formatDate(deployment.createdDateTimeUtc)
-                                                }{" "}
+                                                {formatDate(
+                                                    deployment.createdDateTimeUtc
+                                                )}{" "}
                                                 &nbsp;-&nbsp;
-                                                {formatDate(deployment.modifiedDate)}
+                                                {formatDate(
+                                                    deployment.modifiedDate
+                                                )}
                                                 <br />
                                             </li>
                                         );
@@ -173,9 +175,7 @@ export class DeploymentStatus extends LinkedComponent {
                                 <Btn
                                     primary={true}
                                     type="submit"
-                                    disabled={
-                                        !this.state.haschanged
-                                    }
+                                    disabled={!this.state.haschanged}
                                 >
                                     {t("deployments.flyouts.status.apply")}
                                 </Btn>

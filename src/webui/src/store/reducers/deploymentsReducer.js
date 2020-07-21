@@ -55,7 +55,10 @@ export const epics = createEpicScenario({
     fetchDeployment: {
         type: "DEPLOYMENT_DETAILS_FETCH",
         epic: (fromAction) =>
-            IoTHubManagerService.getDeployment(fromAction.payload)
+            IoTHubManagerService.getDeployment(
+                fromAction.payload.id,
+                fromAction.payload.isLatest
+            )
                 .flatMap((response) => [
                     toActionCreator(
                         redux.actions.updateDeployment,
@@ -73,8 +76,12 @@ export const epics = createEpicScenario({
                 fromAction.payload.packageType ===
                 packagesEnum.deviceConfiguration
             ) {
-                return IoTHubManagerService.getDevicesByQuery(
-                    createDevicesQuery(getDeployedDeviceIds(fromAction.payload))
+                return IoTHubManagerService.getDevicesByQueryForDeployment(
+                    fromAction.payload.id,
+                    createDevicesQuery(
+                        getDeployedDeviceIds(fromAction.payload)
+                    ),
+                    fromAction.payload.isLatest
                 )
                     .map(
                         toActionCreator(
