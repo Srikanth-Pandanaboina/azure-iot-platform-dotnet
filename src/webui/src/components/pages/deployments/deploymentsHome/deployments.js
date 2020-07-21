@@ -76,7 +76,9 @@ export class Deployments extends Component {
                 displayName: rowData.name,
             })
         );
-        this.props.history.push(`/deployments/${deploymentId}`);
+        this.props.history.push(
+            `/deployments/${deploymentId}/${rowData.isLatest}`
+        );
     };
 
     /**
@@ -153,6 +155,7 @@ export class Deployments extends Component {
                         className="deployments-title"
                         titleValue={t("deployments.title")}
                     />
+                    {/* <h1 className="right-corner">//</h1> */}
                     {!!error && <AjaxError t={t} error={error} />}
                     {!error && <DeploymentsGrid {...gridProps} />}
                     {this.state.openFlyoutName === "newDeployment" && (

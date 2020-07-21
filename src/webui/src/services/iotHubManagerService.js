@@ -94,9 +94,9 @@ export class IoTHubManagerService {
     }
 
     /** Returns deployment */
-    static getDeployment(id) {
+    static getDeployment(id, isLatest) {
         return HttpClient.get(
-            `${ENDPOINT}deployments/${id}?includeDeviceStatus=true`
+            `${ENDPOINT}deployments/${id}?includeDeviceStatus=true&isLatest=${isLatest}`
         ).map(toDeploymentModel);
     }
 
@@ -112,6 +112,13 @@ export class IoTHubManagerService {
         return HttpClient.post(`${ENDPOINT}devices/query`, query).map(
             toDevicesModel
         );
+    }
+
+    static getDevicesByQueryForDeployment(id, query, isLatest) {
+        return HttpClient.post(
+            `${ENDPOINT}deployments/devices/${id}?isLatest=${isLatest}`,
+            query
+        ).map(toDevicesModel);
     }
 
     /** Create a deployment */

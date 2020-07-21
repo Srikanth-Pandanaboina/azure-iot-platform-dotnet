@@ -13,7 +13,7 @@ const { checkForEmpty } = gridValueFormatters;
 
 export const deploymentsColumnDefs = {
     isActive: {
-        headerName: "deployments.grid.status",
+        headerName: "  ",
         field: "isActive",
         cellRendererFramework: IsActiveDeploymentRenderer,
     },
