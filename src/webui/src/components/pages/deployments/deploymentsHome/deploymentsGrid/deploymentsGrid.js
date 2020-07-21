@@ -24,6 +24,8 @@ export class DeploymentsGrid extends Component {
             deploymentsColumnDefs.succeeded,
             deploymentsColumnDefs.failed,
             deploymentsColumnDefs.dateCreated,
+            deploymentsColumnDefs.lastModifiedBy,
+            deploymentsColumnDefs.lastModifiedDate,
         ];
     }
 
