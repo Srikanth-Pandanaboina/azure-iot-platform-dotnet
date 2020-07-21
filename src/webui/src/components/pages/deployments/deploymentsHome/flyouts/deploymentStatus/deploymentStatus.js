@@ -261,7 +261,6 @@ export class DeploymentStatus extends LinkedComponent {
                                     primary={true}
                                     type="submit"
                                     disabled={
-                                        !!changesApplied &&
                                         !this.state.haschanged
                                     }
                                 >
