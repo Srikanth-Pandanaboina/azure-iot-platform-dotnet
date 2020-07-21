@@ -45,9 +45,16 @@ export class DeploymentStatus extends LinkedComponent {
         }
     }
 
+    componentWillReceiveProps(nextprops){
+        
+        this.setState({
+            isActive: nextprops.selectedDeployment.isActive,
+        });
+    }
+
     onDeploymentStatusChange = (updatedStatus) => {
         setTimeout(() => {
-            if (this.state.isActive !== updatedStatus) {
+            if (this.props.selectedDeployment.isActive !== updatedStatus) {
                 this.setState({
                     isActive: updatedStatus,
                     haschanged: true,
@@ -168,7 +175,6 @@ export class DeploymentStatus extends LinkedComponent {
                                     primary={true}
                                     type="submit"
                                     disabled={
-                                        !!changesApplied &&
                                         !this.state.haschanged
                                     }
                                 >
