@@ -604,7 +604,7 @@ namespace Mmm.Iot.IoTHubManager.Services
                                                                         {
                                                                             NullValueHandling = NullValueHandling.Ignore,
                                                                         });
-                                await this.client.UpdateAsync(DeploymentsCollection, deploymentId, storageValue, existingDeployment.ETag);
+                                await this.client.UpdateAsync(DeploymentsCollection, latestDeployment.Id, storageValue, latestDeploymentFromStorage.ETag);
                             }
                         }
                     }
@@ -655,7 +655,7 @@ namespace Mmm.Iot.IoTHubManager.Services
                 deployments = response.Items.Select(this.CreateDeploymentServiceModel);
             }
 
-            return new DeploymentServiceListModel(deployments?.ToList());
+            return new DeploymentServiceListModel(deployments?.OrderByDescending(x => x.CreatedDateTimeUtc).ToList());
         }
 
         private async Task<List<TwinServiceModel>> UpdateDevicePropertiesInStorage(IEnumerable<string> deviceIds)
