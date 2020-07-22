@@ -379,6 +379,15 @@ export const getDeployments = createSelector(
                 : acc;
         }, [])
 );
+export const getAllDeployments = createSelector(
+    getDeploymentsEntities,
+    getItems,
+    (deployments, items) =>
+        items.reduce((acc, id) => {
+            const deployment = deployments[id];
+            return deployment ? [...acc, deployment] : acc;
+        }, [])
+);
 export const getCurrentDeploymentDetails = (state) =>
     getDeploymentsReducer(state).currentDeployment || {};
 export const getCurrentDeploymentLastUpdated = (state) =>

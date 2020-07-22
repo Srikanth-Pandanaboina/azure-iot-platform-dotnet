@@ -106,6 +106,7 @@ export class Deployments extends Component {
                 isPending,
                 fetchDeployments,
                 lastUpdated,
+                allActiveDeployments,
             } = this.props,
             gridProps = {
                 rowData: isPending ? undefined : deployments || [],
@@ -155,7 +156,11 @@ export class Deployments extends Component {
                         className="deployments-title"
                         titleValue={t("deployments.title")}
                     />
-                    {/* <h1 className="right-corner">//</h1> */}
+                    <h1 className="right-corner">
+                        {deployments.filter((x) => x.isActive).length}/
+                        {allActiveDeployments.filter((x) => x.isActive).length}/
+                        {allActiveDeployments.length}
+                    </h1>
                     {!!error && <AjaxError t={t} error={error} />}
                     {!error && <DeploymentsGrid {...gridProps} />}
                     {this.state.openFlyoutName === "newDeployment" && (
