@@ -248,12 +248,6 @@ export const toDeploymentModel = (deployment = {}) => {
         "metrics.systemMetrics.targetedCount": "targetedCount",
         "metrics.systemMetrics.pendingCount": "pendingCount",
     });
-
-    modelData.modifiedBy = modelData.modifiedBy || modelData.createdBy;
-    modelData.modifiedDate =
-        modelData.modifiedDate ||
-        modelData.createdDate ||
-        modelData.createdDateTimeUtc;
     return update(modelData, {
         deviceStatuses: {
             $set: dot.pick("Metrics.DeviceStatuses", deployment),

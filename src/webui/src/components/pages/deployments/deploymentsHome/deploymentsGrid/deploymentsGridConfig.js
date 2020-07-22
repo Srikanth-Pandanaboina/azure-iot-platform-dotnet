@@ -72,21 +72,26 @@ export const deploymentsColumnDefs = {
         field: "succeededCount",
         valueFormatter: ({ value }) => checkForEmpty(value),
     },
-    dateCreated: {
-        headerName: "deployments.grid.dateCreated",
-        field: "createdDateTimeUtc",
+    createdOn: {
+        headerName: "deployments.grid.createdOn",
+        field: "createdDate",
         cellRendererFramework: TimeRenderer,
     },
-    lastModifiedBy: {
-        headerName: "deployments.grid.lastModifiedBy",
-        field: "modifiedBy",
+    createdBy: {
+        headerName: "deployments.grid.createdBy",
+        field: "createdBy",
         valueFormatter: ({ value }) => checkForEmpty(value),
     },
-    lastModifiedDate: {
-        headerName: "deployments.grid.lastModifiedDate",
+    modifiedOn: {
+        headerName: "deployments.grid.modifiedOn",
         field: "modifiedDate",
         sort: "desc",
         cellRendererFramework: TimeRenderer,
+    },
+    modifiedBy: {
+        headerName: "deployments.grid.modifiedBy",
+        field: "modifiedBy",
+        valueFormatter: ({ value }) => checkForEmpty(value),
     },
 };
 
