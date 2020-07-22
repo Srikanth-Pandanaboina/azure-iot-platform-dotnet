@@ -948,10 +948,11 @@
             "appliedTooltip": "Number of device twins that have been modified by the configuration.",
             "failed": "Failed",
             "succeeded": "Succeeded",
-            "dateCreated": "Created On",
+            "createdOn": "Created On",
             "status": "Status",
-            "lastModifiedBy":"Last Modified By",
-            "lastModifiedDate":"Last Modified Date"
+            "modifiedBy": "Modified By",
+            "modifiedOn": "Modified On",
+            "createdBy": "Created By"
         }
     },
     "packages": {
