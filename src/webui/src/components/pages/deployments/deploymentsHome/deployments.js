@@ -86,21 +86,19 @@ export class Deployments extends Component {
         );
     };
 
-    /**
-     * Handles context filter changes and calls any hard select props method
-     *
-     * @param {Array} selectedPackages A list of currently selected packages
-     */
-    onRowClicked = (selectedDeployment) => {
-        this.setState({
-            openFlyoutName: "deployment-status",
-            deployment: selectedDeployment.data,
-            relatedDeployments: selectedDeployment.node.gridOptionsWrapper.gridOptions.rowData.filter(
-                (x) =>
-                    x.deviceGroupId === selectedDeployment.data.deviceGroupId &&
-                    x.id !== selectedDeployment.data.id
-            ),
-        });
+    onCellClicked = (selectedDeployment) => {
+        if (selectedDeployment.colDef.field === "isActive") {
+            this.setState({
+                openFlyoutName: "deployment-status",
+                deployment: selectedDeployment.data,
+                relatedDeployments: selectedDeployment.node.gridOptionsWrapper.gridOptions.rowData.filter(
+                    (x) =>
+                        x.deviceGroupId ===
+                            selectedDeployment.data.deviceGroupId &&
+                        x.id !== selectedDeployment.data.id
+                ),
+            });
+        }
     };
 
     render() {
@@ -120,7 +118,7 @@ export class Deployments extends Component {
                 t: t,
                 getSoftSelectId: this.getSoftSelectId,
                 onSoftSelectChange: this.onSoftSelectChange,
-                onRowClicked: this.onRowClicked,
+                onCellClicked: this.onCellClicked,
             };
 
         return (
