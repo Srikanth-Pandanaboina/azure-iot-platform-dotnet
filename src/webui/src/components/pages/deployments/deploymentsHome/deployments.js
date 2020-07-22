@@ -21,6 +21,11 @@ import { DeploymentsGrid } from "./deploymentsGrid";
 import { DeploymentNewContainer, DeploymentStatusContainer } from "./flyouts";
 import { svgs } from "utilities";
 import { CreateDeviceQueryBtnContainer as CreateDeviceQueryBtn } from "components/shell/createDeviceQueryBtn";
+import {
+    Balloon,
+    BalloonPosition,
+    BalloonAlignment,
+} from "@microsoft/azure-iot-ux-fluent-controls/lib/components/Balloon/Balloon";
 
 import "./deployments.scss";
 
@@ -157,9 +162,47 @@ export class Deployments extends Component {
                         titleValue={t("deployments.title")}
                     />
                     <h1 className="right-corner">
-                        {deployments.filter((x) => x.isActive).length}/
-                        {allActiveDeployments.filter((x) => x.isActive).length}/
-                        {allActiveDeployments.length}
+                        <Balloon
+                            position={BalloonPosition.Bottom}
+                            align={BalloonAlignment.Center}
+                            tooltip={
+                                <div>
+                                    Number of Active deployments associated with
+                                    the current device group
+                                </div>
+                            }
+                        >
+                            {deployments.filter((x) => x.isActive).length}
+                        </Balloon>
+                        /
+                        <Balloon
+                            position={BalloonPosition.Bottom}
+                            align={BalloonAlignment.Center}
+                            tooltip={
+                                <div>
+                                    Number of Active deployments associated with
+                                    all device group
+                                </div>
+                            }
+                        >
+                            {
+                                allActiveDeployments.filter((x) => x.isActive)
+                                    .length
+                            }
+                        </Balloon>
+                        /
+                        <Balloon
+                            position={BalloonPosition.Bottom}
+                            align={BalloonAlignment.Center}
+                            tooltip={
+                                <div>
+                                    Total number of deployments available in IOT
+                                    Hub
+                                </div>
+                            }
+                        >
+                            {allActiveDeployments.length}
+                        </Balloon>
                     </h1>
                     {!!error && <AjaxError t={t} error={error} />}
                     {!error && <DeploymentsGrid {...gridProps} />}
