@@ -18,6 +18,8 @@ const mapStateToProps = (state) => ({
     }),
     // Wrap the dispatch methods
     mapDispatchToProps = (dispatch) => ({
+        fetchDeployments: () =>
+            dispatch(deploymentsEpics.actions.fetchDeployments()),
         fetchDeployment: (id) =>
             dispatch(deploymentsEpics.actions.fetchDeployment(id)),
         resetDeployedDevices: () =>
