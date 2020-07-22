@@ -170,7 +170,29 @@ namespace Mmm.Iot.IoTHubManager.Services
 
         public async Task<DeploymentServiceListModel> ListAllAsync()
         {
-            return await this.GetListAsync();
+            var deploymentsFromStorage = await this.GetListAsync();
+
+            if (deploymentsFromStorage != null && deploymentsFromStorage.Items?.Count > 0)
+            {
+                var deploymentsFromHub = await this.ListAsync();
+
+                if (deploymentsFromHub != null && deploymentsFromHub.Items?.Count > 0)
+                {
+                    deploymentsFromStorage.Items.ForEach(x =>
+                    {
+                        if (x.Tags.Contains("reserved.latest"))
+                        {
+                            var deploymentFromHub = deploymentsFromHub.Items.FirstOrDefault(i => i.Id == x.Id);
+                            if (deploymentFromHub != null)
+                            {
+                                x.DeploymentMetrics = deploymentFromHub.DeploymentMetrics;
+                            }
+                        }
+                    });
+                }
+            }
+
+            return deploymentsFromStorage;
         }
 
         public async Task<DeploymentServiceModel> GetAsync(string deploymentId, bool includeDeviceStatus = false, bool isLatest = true)
@@ -200,10 +222,10 @@ namespace Mmm.Iot.IoTHubManager.Services
                 return new DeploymentServiceModel(deployment)
                 {
                     DeploymentMetrics =
-                    {
-                        DeviceMetrics = this.CalculateDeviceMetrics(deviceStatuses),
-                        DeviceStatuses = includeDeviceStatus ? deviceStatuses : null,
-                    },
+                {
+                    DeviceMetrics = this.CalculateDeviceMetrics(deviceStatuses),
+                    DeviceStatuses = includeDeviceStatus ? deviceStatuses : null,
+                },
                     Tags = new List<string>() { "reserved.latest" },
                 };
             }
@@ -229,10 +251,24 @@ namespace Mmm.Iot.IoTHubManager.Services
                 throw new ArgumentNullException(nameof(deploymentId));
             }
 
+            var existingDeployment = await this.GetDeploymentFromStorageAsync(deploymentId);
+            List<TwinServiceModel> deviceTwins = null;
+            if (existingDeployment != null && existingDeployment.Tags.Contains("reserved.latest"))
+            {
+                var currentDeployment = await this.GetAsync(deploymentId, true, true);
+
+                if (currentDeployment != null)
+                {
+                    existingDeployment.DeploymentMetrics = currentDeployment.DeploymentMetrics;
+                }
+
+                deviceTwins = await this.GetDeviceProperties(currentDeployment.DeploymentMetrics.DeviceStatuses.Keys);
+            }
+
             await this.tenantHelper.GetRegistry().RemoveConfigurationAsync(deploymentId);
 
             // Mark the Deployment as Inactive in CosmosDb collection
-            await this.MarkDeploymentAsInactive(deploymentId, userId);
+            await this.MarkDeploymentAsInactive(existingDeployment, userId, deviceTwins);
 
             // Log a custom event to Application Insights
             this.deploymentLog.LogDeploymentDelete(deploymentId, tenantId, userId);
@@ -291,15 +327,15 @@ namespace Mmm.Iot.IoTHubManager.Services
 
         private async Task<TwinServiceListModel> GetDeploymentDevicesAsync(string deploymentId)
         {
-            IEnumerable<TwinServiceModel> deploymentImpactedDevices = null;
+            List<TwinServiceModel> deploymentImpactedDevices = new List<TwinServiceModel>();
             var response = await this.client.GetAllAsync(string.Format(DeploymentDevicePropertiesCollection, deploymentId));
 
             if (response != null && response.Items.Count > 0)
             {
-                deploymentImpactedDevices = response.Items.Select(this.CreateTwinServiceModel);
+                deploymentImpactedDevices.AddRange(response.Items.Select(this.CreateTwinServiceModel));
             }
 
-            return new TwinServiceListModel(deploymentImpactedDevices?.ToList());
+            return new TwinServiceListModel(deploymentImpactedDevices);
         }
 
         private bool CheckIfDeploymentWasMadeByRM(Configuration conf)
@@ -455,7 +491,7 @@ namespace Mmm.Iot.IoTHubManager.Services
 
                     currentDeployment.DeploymentMetrics.DeviceStatuses = this.GetDeviceStatuses(deploymentDetails);
 
-                    var deviceTwins = await this.UpdateDevicePropertiesInStorage(currentDeployment.DeploymentMetrics.DeviceStatuses.Keys);
+                    var deviceTwins = await this.GetDeviceProperties(currentDeployment.DeploymentMetrics.DeviceStatuses.Keys);
 
                     // Since the deployment that will be created have highest priority, remove latest tag on current deployment
                     if (currentDeployment?.Tags != null)
@@ -540,10 +576,8 @@ namespace Mmm.Iot.IoTHubManager.Services
             return output;
         }
 
-        private async Task<DeploymentServiceModel> MarkDeploymentAsInactive(string deploymentId, string userId)
+        private async Task<DeploymentServiceModel> MarkDeploymentAsInactive(DeploymentServiceModel existingDeployment, string userId, List<TwinServiceModel> deviceTwins)
         {
-            var existingDeployment = await this.GetDeploymentFromStorageAsync(deploymentId);
-
             if (existingDeployment != null)
             {
                 if (existingDeployment.Tags == null)
@@ -558,7 +592,9 @@ namespace Mmm.Iot.IoTHubManager.Services
 
                 existingDeployment.Tags.Add("reserved.inactive");
 
-                if (existingDeployment.Tags.Contains("reserved.latest", StringComparer.InvariantCultureIgnoreCase))
+                bool isLatestDeployment = existingDeployment.Tags.Contains("reserved.latest", StringComparer.InvariantCultureIgnoreCase);
+
+                if (isLatestDeployment)
                 {
                     existingDeployment.Tags.Remove("reserved.latest");
                 }
@@ -572,40 +608,48 @@ namespace Mmm.Iot.IoTHubManager.Services
                     {
                         NullValueHandling = NullValueHandling.Ignore,
                     });
-                var response = await this.client.UpdateAsync(DeploymentsCollection, deploymentId, value, existingDeployment.ETag);
+                var response = await this.client.UpdateAsync(DeploymentsCollection, existingDeployment.Id, value, existingDeployment.ETag);
 
-                // Mark the deployment with highest priority and which is created last as the latest deployment.
-                var deployments = await this.ListAsync();
-
-                if (deployments != null && deployments.Items.Count > 0)
+                if (deviceTwins != null && deviceTwins.Count > 0)
                 {
-                    var deploymentsOfDeviceGroup = deployments.Items.Where(i => i.DeviceGroupId == existingDeployment.DeviceGroupId).OrderByDescending(p => p.Priority).ThenByDescending(q => q.CreatedDateTimeUtc);
+                    await this.StoreDevicePropertiesInStorage(deviceTwins, existingDeployment.Id);
+                }
 
-                    if (deploymentsOfDeviceGroup != null && deploymentsOfDeviceGroup.Count() > 0)
+                if (isLatestDeployment)
+                {
+                    // Mark the deployment with highest priority and which is created last as the latest deployment.
+                    var deployments = await this.ListAsync();
+
+                    if (deployments != null && deployments.Items.Count > 0)
                     {
-                        var latestDeployment = deploymentsOfDeviceGroup.First();
+                        var deploymentsOfDeviceGroup = deployments.Items.Where(i => i.DeviceGroupId == existingDeployment.DeviceGroupId).OrderByDescending(p => p.Priority).ThenByDescending(q => q.CreatedDateTimeUtc);
 
-                        var latestDeploymentFromStorage = await this.GetDeploymentFromStorageAsync(latestDeployment.Id);
-
-                        if (latestDeploymentFromStorage != null)
+                        if (deploymentsOfDeviceGroup != null && deploymentsOfDeviceGroup.Count() > 0)
                         {
-                            if (latestDeploymentFromStorage.Tags == null)
-                            {
-                                latestDeploymentFromStorage.Tags = new List<string>();
-                            }
+                            var latestDeployment = deploymentsOfDeviceGroup.First();
 
-                            if (!latestDeploymentFromStorage.Tags.Contains("reserved.latest"))
-                            {
-                                latestDeploymentFromStorage.Tags.Add("reserved.latest");
+                            var latestDeploymentFromStorage = await this.GetDeploymentFromStorageAsync(latestDeployment.Id);
 
-                                var storageValue = JsonConvert.SerializeObject(
-                                                                        latestDeploymentFromStorage,
-                                                                        Formatting.Indented,
-                                                                        new JsonSerializerSettings
-                                                                        {
-                                                                            NullValueHandling = NullValueHandling.Ignore,
-                                                                        });
-                                await this.client.UpdateAsync(DeploymentsCollection, latestDeployment.Id, storageValue, latestDeploymentFromStorage.ETag);
+                            if (latestDeploymentFromStorage != null)
+                            {
+                                if (latestDeploymentFromStorage.Tags == null)
+                                {
+                                    latestDeploymentFromStorage.Tags = new List<string>();
+                                }
+
+                                if (!latestDeploymentFromStorage.Tags.Contains("reserved.latest"))
+                                {
+                                    latestDeploymentFromStorage.Tags.Add("reserved.latest");
+
+                                    var storageValue = JsonConvert.SerializeObject(
+                                                                            latestDeploymentFromStorage,
+                                                                            Formatting.Indented,
+                                                                            new JsonSerializerSettings
+                                                                            {
+                                                                                NullValueHandling = NullValueHandling.Ignore,
+                                                                            });
+                                    await this.client.UpdateAsync(DeploymentsCollection, latestDeployment.Id, storageValue, latestDeploymentFromStorage.ETag);
+                                }
                             }
                         }
                     }
@@ -659,7 +703,7 @@ namespace Mmm.Iot.IoTHubManager.Services
             return new DeploymentServiceListModel(deployments?.OrderByDescending(x => x.CreatedDateTimeUtc).ToList());
         }
 
-        private async Task<List<TwinServiceModel>> UpdateDevicePropertiesInStorage(IEnumerable<string> deviceIds)
+        private async Task<List<TwinServiceModel>> GetDeviceProperties(IEnumerable<string> deviceIds)
         {
             List<TwinServiceModel> twins = null;
             DeviceServiceListModel devices = null;
