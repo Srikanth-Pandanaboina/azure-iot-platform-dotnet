@@ -688,18 +688,19 @@ namespace Mmm.Iot.IoTHubManager.Services
                 }
             }
 
-                            if (!latestDeploymentFromStorage.Tags.Contains("reserved.latest"))
-                            {
-                                latestDeploymentFromStorage.Tags.Add("reserved.latest");
+                                if (!latestDeploymentFromStorage.Tags.Contains("reserved.latest"))
+                                {
+                                    latestDeploymentFromStorage.Tags.Add("reserved.latest");
 
-                                var storageValue = JsonConvert.SerializeObject(
-                                                                        latestDeploymentFromStorage,
-                                                                        Formatting.Indented,
-                                                                        new JsonSerializerSettings
-                                                                        {
-                                                                            NullValueHandling = NullValueHandling.Ignore,
-                                                                        });
-                                await this.client.UpdateAsync(DeploymentsCollection, latestDeployment.Id, storageValue, latestDeploymentFromStorage.ETag);
+                                    var storageValue = JsonConvert.SerializeObject(
+                                                                            latestDeploymentFromStorage,
+                                                                            Formatting.Indented,
+                                                                            new JsonSerializerSettings
+                                                                            {
+                                                                                NullValueHandling = NullValueHandling.Ignore,
+                                                                            });
+                                    await this.client.UpdateAsync(DeploymentsCollection, latestDeployment.Id, storageValue, latestDeploymentFromStorage.ETag);
+                                }
                             }
                         }
                     }
