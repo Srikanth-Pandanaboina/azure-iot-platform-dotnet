@@ -87,6 +87,7 @@ export class DeploymentStatus extends LinkedComponent {
     postUpdatingDeployment() {
         this.genericCloseClick("DeploymentStatus_CloseClick");
         this.setState({ changesApplied: false });
+        this.props.fetchDeployments();
     }
 
     render() {
