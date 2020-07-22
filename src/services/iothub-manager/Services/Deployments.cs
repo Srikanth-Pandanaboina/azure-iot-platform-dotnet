@@ -317,7 +317,7 @@ namespace Mmm.Iot.IoTHubManager.Services
                 {
                     devices.Items.ForEach(item =>
                     {
-                        item.Twin = deviceTwinProperties.Items.FirstOrDefault(i => i.DeviceId == item.Id);
+                        item.Twin = deviceTwinProperties.Items.LastOrDefault(i => i.DeviceId == item.Id);
                     });
                 }
             }
