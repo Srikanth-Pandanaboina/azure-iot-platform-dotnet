@@ -9,7 +9,7 @@ import {
     getDeployments,
     getDeploymentsLastUpdated,
     epics as deploymentsEpics,
-    getAllDeployments
+    getAllDeployments,
 } from "store/reducers/deploymentsReducer";
 import {
     redux as appRedux,
