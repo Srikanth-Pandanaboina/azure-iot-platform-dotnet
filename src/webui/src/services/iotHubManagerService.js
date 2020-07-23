@@ -145,7 +145,7 @@ export class IoTHubManagerService {
     }
 
     static reactivateDeployment(id) {
-        return HttpClient.put(`${ENDPOINT}deployments/${id}`).map(() => id);
+        return HttpClient.put(`${ENDPOINT}deployments/${id}`);
     }
 
     /** Returns deployments */

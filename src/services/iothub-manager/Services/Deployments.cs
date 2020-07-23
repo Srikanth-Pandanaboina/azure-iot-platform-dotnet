@@ -688,9 +688,9 @@ namespace Mmm.Iot.IoTHubManager.Services
                 }
             }
 
-                                if (!latestDeploymentFromStorage.Tags.Contains("reserved.latest"))
+                                if (!latestDeploymentFromStorage.Tags.Contains(LatestTag))
                                 {
-                                    latestDeploymentFromStorage.Tags.Add("reserved.latest");
+                                    latestDeploymentFromStorage.Tags.Add(LatestTag);
 
                                     var storageValue = JsonConvert.SerializeObject(
                                                                             latestDeploymentFromStorage,
