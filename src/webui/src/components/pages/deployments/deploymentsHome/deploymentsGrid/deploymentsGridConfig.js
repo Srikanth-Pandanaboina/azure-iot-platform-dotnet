@@ -7,11 +7,26 @@ import {
     IsActiveDeploymentRenderer,
 } from "components/shared/cellRenderers";
 import { getPackageTypeTranslation, getConfigTypeTranslation } from "utilities";
-import { gridValueFormatters } from "components/shared/pcsGrid/pcsGridConfig";
+import {
+    gridValueFormatters,
+    checkboxColumn,
+} from "components/shared/pcsGrid/pcsGridConfig";
 
 const { checkForEmpty } = gridValueFormatters;
 
 export const deploymentsColumnDefs = {
+    checkBox: {
+        lockPosition: checkboxColumn.lockPosition,
+        cellClass: checkboxColumn.cellClass,
+        headerClass: checkboxColumn.headerClass,
+        suppressResize: checkboxColumn.suppressResize,
+        checkboxSelection: checkboxColumn.checkboxSelection,
+        headerCheckboxSelection: checkboxColumn.headerCheckboxSelection,
+        headerCheckboxSelectionFilteredOnly:
+            checkboxColumn.headerCheckboxSelectionFilteredOnly,
+        suppressMovable: checkboxColumn.suppressMovable,
+        width: 50,
+    },
     isActive: {
         headerName: "  ",
         field: "isActive",

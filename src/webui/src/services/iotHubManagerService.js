@@ -130,12 +130,14 @@ export class IoTHubManagerService {
     }
 
     /** Delete a deployment */
-    static deleteDeployment(id) {
-        return HttpClient.delete(`${ENDPOINT}deployments/${id}`).map(() => id);
+    static deleteDeployment(id, isDelete = true) {
+        return HttpClient.delete(
+            `${ENDPOINT}deployments/${id}?isDelete=${isDelete}`
+        ).map(() => id);
     }
 
     static reactivateDeployment(id) {
-        return HttpClient.put(`${ENDPOINT}deployments/${id}`).map(() => id);
+        return HttpClient.put(`${ENDPOINT}deployments/${id}`);
     }
 
     /** Returns deployments */

@@ -78,15 +78,15 @@ export class DeploymentStatus extends LinkedComponent {
                 deploymentId
             ).subscribe(() => this.postUpdatingDeployment());
         } else {
-            IoTHubManagerService.deleteDeployment(deploymentId).subscribe(() =>
+            IoTHubManagerService.deleteDeployment(deploymentId, false).subscribe(() =>
                 this.postUpdatingDeployment()
             );
         }
     }
 
     postUpdatingDeployment() {
-        this.genericCloseClick("DeploymentStatus_CloseClick");
         this.setState({ changesApplied: false });
+        this.genericCloseClick("DeploymentStatus_CloseClick");
         this.props.fetchDeployments();
     }
 
