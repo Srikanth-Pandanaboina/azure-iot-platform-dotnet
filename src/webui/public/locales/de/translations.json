@@ -930,7 +930,8 @@
         "delete": {
           "contextMenuName": "Löschen",
           "title": "Löschen-Bereitstellung?",
-          "info": "Das löschen von '{{deploymentName}}' aufhören wird diese Bereitstellung von für diese Geräte. Es kann zu einer niedrigeren Priorität der Bereitstellung angewendet werden."
+          "info": "Das löschen von '{{deploymentName}}' aufhören wird diese Bereitstellung von für diese Geräte. Es kann zu einer niedrigeren Priorität der Bereitstellung angewendet werden.",
+          "gridInfo": "Deleting selected deployment(s) will stop deployment from being applied to the devices. It may result in a lower priority deployment being applied if any"
         }
       },
       "grid": {

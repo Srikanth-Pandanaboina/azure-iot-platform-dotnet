@@ -18,7 +18,7 @@ namespace Mmm.Iot.IoTHubManager.Services
 
         Task<DeploymentServiceModel> GetAsync(string id, bool includeDeviceStatus, bool isLatest);
 
-        Task DeleteAsync(string deploymentId, string userId, string tenantId);
+        Task DeleteAsync(string deploymentId, string userId, string tenantId, bool isDelete);
 
         Task<PackageApiModel> GetPackageAsync(string packageId);
 

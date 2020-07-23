@@ -14,6 +14,9 @@ namespace Mmm.Iot.IoTHubManager.WebService.Models
 {
     public class DeploymentApiModel : AuditApiModel
     {
+        private const string LatestTag = "reserved.latest";
+        private const string InActiveTag = "reserved.inactive";
+
         public DeploymentApiModel()
         {
             this.Metadata = new Dictionary<string, string>
@@ -37,8 +40,8 @@ namespace Mmm.Iot.IoTHubManager.WebService.Models
             this.Priority = serviceModel.Priority;
             this.PackageType = serviceModel.PackageType;
             this.ConfigType = serviceModel.ConfigType;
-            this.IsActive = !(serviceModel.Tags != null && serviceModel.Tags.Contains("reserved.inactive"));
-            this.IsLatest = serviceModel.Tags != null && serviceModel.Tags.Contains("reserved.latest");
+            this.IsActive = !(serviceModel.Tags != null && serviceModel.Tags.Contains(InActiveTag));
+            this.IsLatest = serviceModel.Tags != null && serviceModel.Tags.Contains(LatestTag);
             this.Metrics = new DeploymentMetricsApiModel(serviceModel.DeploymentMetrics)
             {
                 DeviceStatuses = serviceModel.DeploymentMetrics?.DeviceStatuses,

@@ -46,6 +46,9 @@ namespace Mmm.Iot.IoTHubManager.Services
         private const string SuccessQueryName = "current";
         private const string DeploymentsCollection = "deployments";
         private const string DeploymentDevicePropertiesCollection = "deploymentdevices-{0}";
+        private const string DeleteTag = "reserved.isDeleted";
+        private const string LatestTag = "reserved.latest";
+        private const string InActiveTag = "reserved.inactive";
         private readonly ILogger logger;
         private readonly IDeploymentEventLog deploymentLog;
         private readonly ITenantConnectionHelper tenantHelper;
@@ -138,7 +141,7 @@ namespace Mmm.Iot.IoTHubManager.Services
                     model.Tags = new List<string>();
                 }
 
-                model.Tags.Add("reserved.latest");
+                model.Tags.Add(LatestTag);
             }
 
             // Store the deployment details in Cosmos DB
@@ -174,13 +177,14 @@ namespace Mmm.Iot.IoTHubManager.Services
 
             if (deploymentsFromStorage != null && deploymentsFromStorage.Items?.Count > 0)
             {
+                deploymentsFromStorage.Items = deploymentsFromStorage.Items.Where(x => !x.Tags.Contains(DeleteTag)).ToList();
                 var deploymentsFromHub = await this.ListAsync();
 
                 if (deploymentsFromHub != null && deploymentsFromHub.Items?.Count > 0)
                 {
                     deploymentsFromStorage.Items.ForEach(x =>
                     {
-                        if (x.Tags.Contains("reserved.latest"))
+                        if (x.Tags.Contains(LatestTag))
                         {
                             var deploymentFromHub = deploymentsFromHub.Items.FirstOrDefault(i => i.Id == x.Id);
                             if (deploymentFromHub != null)
@@ -226,7 +230,7 @@ namespace Mmm.Iot.IoTHubManager.Services
                     DeviceMetrics = this.CalculateDeviceMetrics(deviceStatuses),
                     DeviceStatuses = includeDeviceStatus ? deviceStatuses : null,
                 },
-                    Tags = new List<string>() { "reserved.latest" },
+                    Tags = new List<string>() { LatestTag },
                 };
             }
             else
@@ -244,7 +248,7 @@ namespace Mmm.Iot.IoTHubManager.Services
             }
         }
 
-        public async Task DeleteAsync(string deploymentId, string userId, string tenantId)
+        public async Task DeleteAsync(string deploymentId, string userId, string tenantId, bool isDelete)
         {
             if (string.IsNullOrEmpty(deploymentId))
             {
@@ -252,23 +256,33 @@ namespace Mmm.Iot.IoTHubManager.Services
             }
 
             var existingDeployment = await this.GetDeploymentFromStorageAsync(deploymentId);
-            List<TwinServiceModel> deviceTwins = null;
-            if (existingDeployment != null && existingDeployment.Tags.Contains("reserved.latest"))
+            if (!existingDeployment.Tags.Contains(InActiveTag))
             {
-                var currentDeployment = await this.GetAsync(deploymentId, true, true);
-
-                if (currentDeployment != null)
+                List<TwinServiceModel> deviceTwins = null;
+                if (existingDeployment != null && existingDeployment.Tags.Contains(LatestTag))
                 {
-                    existingDeployment.DeploymentMetrics = currentDeployment.DeploymentMetrics;
+                    var currentDeployment = await this.GetAsync(deploymentId, true, true);
+
+                    if (currentDeployment != null)
+                    {
+                        existingDeployment.DeploymentMetrics = currentDeployment.DeploymentMetrics;
+                    }
+
+                    deviceTwins = await this.GetDeviceProperties(currentDeployment.DeploymentMetrics.DeviceStatuses.Keys);
                 }
 
-                deviceTwins = await this.GetDeviceProperties(currentDeployment.DeploymentMetrics.DeviceStatuses.Keys);
+                await this.tenantHelper.GetRegistry().RemoveConfigurationAsync(deploymentId);
+
+                // Mark the Deployment as Inactive in CosmosDb collection
+                await this.MarkDeploymentAsInactive(existingDeployment, userId, deviceTwins, isDelete);
             }
-
-            await this.tenantHelper.GetRegistry().RemoveConfigurationAsync(deploymentId);
-
-            // Mark the Deployment as Inactive in CosmosDb collection
-            await this.MarkDeploymentAsInactive(existingDeployment, userId, deviceTwins);
+            else
+            {
+                if (isDelete)
+                {
+                    await this.MarkDeploymentAsDeleted(existingDeployment, userId);
+                }
+            }
 
             // Log a custom event to Application Insights
             this.deploymentLog.LogDeploymentDelete(deploymentId, tenantId, userId);
@@ -496,7 +510,7 @@ namespace Mmm.Iot.IoTHubManager.Services
                     // Since the deployment that will be created have highest priority, remove latest tag on current deployment
                     if (currentDeployment?.Tags != null)
                     {
-                        var existingTag = currentDeployment.Tags.FirstOrDefault(t => t.Equals("reserved.latest", StringComparison.OrdinalIgnoreCase));
+                        var existingTag = currentDeployment.Tags.FirstOrDefault(t => t.Equals(LatestTag, StringComparison.OrdinalIgnoreCase));
                         if (existingTag != null)
                         {
                             currentDeployment.Tags.Remove(existingTag);
@@ -576,7 +590,7 @@ namespace Mmm.Iot.IoTHubManager.Services
             return output;
         }
 
-        private async Task<DeploymentServiceModel> MarkDeploymentAsInactive(DeploymentServiceModel existingDeployment, string userId, List<TwinServiceModel> deviceTwins)
+        private async Task<DeploymentServiceModel> MarkDeploymentAsInactive(DeploymentServiceModel existingDeployment, string userId, List<TwinServiceModel> deviceTwins, bool isDelete)
         {
             if (existingDeployment != null)
             {
@@ -585,18 +599,22 @@ namespace Mmm.Iot.IoTHubManager.Services
                     existingDeployment.Tags = new List<string>();
                 }
 
-                if (existingDeployment.Tags.Contains("reserved.inactive", StringComparer.InvariantCultureIgnoreCase))
+                if (existingDeployment.Tags.Contains(InActiveTag, StringComparer.InvariantCultureIgnoreCase))
                 {
                     return existingDeployment;
                 }
 
-                existingDeployment.Tags.Add("reserved.inactive");
+                existingDeployment.Tags.Add(InActiveTag);
+                if (isDelete)
+                {
+                    existingDeployment.Tags.Add(DeleteTag);
+                }
 
-                bool isLatestDeployment = existingDeployment.Tags.Contains("reserved.latest", StringComparer.InvariantCultureIgnoreCase);
+                bool isLatestDeployment = existingDeployment.Tags.Contains(LatestTag, StringComparer.InvariantCultureIgnoreCase);
 
                 if (isLatestDeployment)
                 {
-                    existingDeployment.Tags.Remove("reserved.latest");
+                    existingDeployment.Tags.Remove(LatestTag);
                 }
 
                 AuditHelper.UpdateAuditingData(existingDeployment, userId);
@@ -637,9 +655,9 @@ namespace Mmm.Iot.IoTHubManager.Services
                                     latestDeploymentFromStorage.Tags = new List<string>();
                                 }
 
-                                if (!latestDeploymentFromStorage.Tags.Contains("reserved.latest"))
+                                if (!latestDeploymentFromStorage.Tags.Contains(LatestTag))
                                 {
-                                    latestDeploymentFromStorage.Tags.Add("reserved.latest");
+                                    latestDeploymentFromStorage.Tags.Add(LatestTag);
 
                                     var storageValue = JsonConvert.SerializeObject(
                                                                             latestDeploymentFromStorage,
@@ -668,7 +686,7 @@ namespace Mmm.Iot.IoTHubManager.Services
                 return existingDeployment;
             }
 
-            var existingTag = existingDeployment.Tags.FirstOrDefault(t => t.Equals("reserved.inactive", StringComparison.OrdinalIgnoreCase));
+            var existingTag = existingDeployment.Tags.FirstOrDefault(t => t.Equals(InActiveTag, StringComparison.OrdinalIgnoreCase));
             if (existingTag == null)
             {
                 return existingDeployment;
@@ -686,6 +704,27 @@ namespace Mmm.Iot.IoTHubManager.Services
                     NullValueHandling = NullValueHandling.Ignore,
                 });
             var response = await this.client.UpdateAsync(DeploymentsCollection, deploymentId, value, existingDeployment.ETag);
+
+            return existingDeployment;
+        }
+
+        private async Task<DeploymentServiceModel> MarkDeploymentAsDeleted(DeploymentServiceModel existingDeployment, string userId)
+        {
+            if (existingDeployment != null)
+            {
+                existingDeployment.Tags.Add(DeleteTag);
+
+                AuditHelper.UpdateAuditingData(existingDeployment, userId);
+
+                var value = JsonConvert.SerializeObject(
+                    existingDeployment,
+                    Formatting.Indented,
+                    new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                    });
+                var response = await this.client.UpdateAsync(DeploymentsCollection, existingDeployment.Id, value, existingDeployment.ETag);
+            }
 
             return existingDeployment;
         }

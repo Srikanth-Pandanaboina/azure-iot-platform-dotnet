@@ -107,9 +107,9 @@ namespace Mmm.Iot.IoTHubManager.WebService.Controllers
 
         [HttpDelete("{id}")]
         [Authorize("DeleteDeployments")]
-        public async Task DeleteAsync(string id)
+        public async Task DeleteAsync(string id, [FromQuery] bool isDelete)
         {
-            await this.deployments.DeleteAsync(id, this.GetClaimsUserDetails(), this.GetTenantId());
+            await this.deployments.DeleteAsync(id, this.GetClaimsUserDetails(), this.GetTenantId(), isDelete);
         }
 
         [HttpPut("{id}")]
