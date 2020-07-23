@@ -162,7 +162,7 @@
                     }
                 }
             }
-            
+
 
         }
     },
@@ -645,6 +645,8 @@
         "title": "Rules",
         "searchPlaceholder": "Search rules...",
         "ariaLabel": "Search rules",
+        "alertingOnForRules": "Alerting must be turned on to use Rules",
+        "turnOnRulesText": "You may turn this feature on by clicking the settings menu (gear icon) at the top right of the  screen",
         "severity": {
             "info": "Info",
             "warning": "Warning",
