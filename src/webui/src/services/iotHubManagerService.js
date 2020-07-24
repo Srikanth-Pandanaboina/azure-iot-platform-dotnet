@@ -137,7 +137,11 @@ export class IoTHubManagerService {
     }
 
     static reactivateDeployment(id) {
-        return HttpClient.put(`${ENDPOINT}deployments/${id}`);
+        return HttpClient.put(
+            `${ENDPOINT}deployments/${id}`,
+            {},
+            { timeout: 120000 }
+        );
     }
 
     /** Returns deployments */
