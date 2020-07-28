@@ -101,6 +101,7 @@ stages:
         parameters:
           subscriptionName: $(subscriptionName)
           locationName: $(locationName)
+          appInsightsLocation: eastus
           environmentName: $(environmentName)
           subscriptionId: $(subscriptionId)
           applicationCode: $(applicationCode)
