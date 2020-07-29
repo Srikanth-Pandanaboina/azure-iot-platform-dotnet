@@ -108,8 +108,9 @@ function CreateSendGridAccount() {
         "scopes": ["mail.send", "alerts.create","alerts.read"]
         }
 "@    
+        Write-Output "Making API Call...."
         $response = Invoke-RestMethod -uri $sendGridUri -Method Post -ContentType "application/json" -Headers $requestHeader -Body $requestBody
-    
+        Write-Output $response
         $sendGridApiKey = $response.api_key
         if (![string]::IsNullOrEmpty($sendGridApiKey)){
             Write-Host "Successfully created an API Key on the Sendgrid Account"
