@@ -964,7 +964,7 @@ jobs:
 
   - job: automationAccount
     displayName: Provision Azure Automation and Sendgrid accounts
-    dependsOn: []
+    dependsOn: 
        - aks
        - keyVault
     variables:
