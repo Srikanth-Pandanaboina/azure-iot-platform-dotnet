@@ -56,24 +56,24 @@ function CreateRandomPassword() {
 function CreateSendGridAccount() {
     $password = CreateRandomPassword
     $newAzResourceParameters = @{
-        Location          = $location
-        ResourceGroupName = $resourceGroup
-        ResourceType      = $resourceType
-        ResourceName      = $resourceName
+        Location          = $location;
+        ResourceGroupName = $resourceGroup;
+        ResourceType      = $resourceType;
+        ResourceName      = $resourceName;
         Plan = @{
-            Name          = 'free'
-            Publisher     = 'Sendgrid'
-            Product       = 'sendgrid_azure'
+            Name          = 'free';
+            Publisher     = 'Sendgrid';
+            Product       = 'sendgrid_azure';
             PromotionCode = ''
         }
         Properties = @{
-            password              = $password
-            acceptMarketingEmails = '0'
-            email                 = $email
-            firstName             = $firstName
-            lastName              = $lastName
-            company               = '3M'
-            website               = 'https:\\www.3m.com'
+            password              = $password;
+            acceptMarketingEmails = '0';
+            email                 = $email;
+            firstName             = $firstName;
+            lastName              = $lastName;
+            company               = '3M';
+            website               = 'https:\\www.3m.com';
         }
     }
 
