@@ -70,7 +70,7 @@ variables:
   - name: mmmIotPlatformIngressHelmChartReleaseName
     value: ingress-$(buildId)
   - name: serenityDevTenantId
-    value: 365f0a6e-2216-4d3f-ac44-4e26632cb738
+    value: 233a1ca2-6855-43c5-8b9c-c7f85a1dd520
   - name: testPipelineDomain
     value: iot.cld.3m.com
   - name: testPipelineFqdn
@@ -182,6 +182,14 @@ stages:
           - checkout: self
             displayName: Checkout repository
 
+          - template: ../templates/print-build-variables.yaml
+
+          - template: ../templates/print-agent-variables.yaml
+
+          - template: ../templates/print-system-variables.yaml
+
+          - template: ../templates/print-common-variables.yaml
+
           - pwsh: |-
               if (!(Test-Path $(commitsSinceLastReleaseArtifactName))) {
                 New-Item $(commitsSinceLastReleaseArtifactName) -Type Directory
@@ -191,6 +199,8 @@ stages:
                 Select-Object -First 1
               $logFilePath = (Join-Path $(commitsSinceLastReleaseArtifactName) git-log.txt)
               "Commits since ${previousReleaseTag}:" | Set-Content $logFilePath
+              Write-Output "previousReleaseTag: $previousReleaseTag"
+              Write-Output 'Build.SourceVersion: $(Build.SourceVersion)'
               git log --oneline --no-decorate --topo-order ^$previousReleaseTag $(Build.SourceVersion) |
                 Tee-Object $logFilePath -Append
 
