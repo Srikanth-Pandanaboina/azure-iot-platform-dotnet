@@ -187,11 +187,6 @@ export const epics = createEpicScenario({
                         Object.keys(getDeviceGroupEntities(store.getState()))[0]
                 )
                 .map(
-                    (value) =>
-                        value ||
-                        Object.keys(getDeviceGroupEntities(store.getState()))[0]
-                )
-                .map(
                     toActionCreator(
                         redux.actions.updateActiveDeviceGroup,
                         fromAction
@@ -606,7 +601,7 @@ export const getActiveDeviceGroup = createSelector(
 );
 export const getActiveDeviceGroupConditions = createSelector(
     getActiveDeviceGroup,
-    (activeDeviceGroup) => (activeDeviceGroup || {}).conditions
+    (activeDeviceGroup) => (activeDeviceGroup || { conditions: []}).conditions
 );
 export const getLogo = (state) => getAppReducer(state).logo;
 export const getName = (state) => getAppReducer(state).name;
