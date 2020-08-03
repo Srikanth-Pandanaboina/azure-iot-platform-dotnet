@@ -1,9 +1,0 @@
-trigger: none
- # branches:
- #   include:
- #     - master
-name: FunctionApp Deployment
-stages:
-  - template: ../../src/functions/azure-iot-appconfig-function/templates/deploy-env.yaml
-  - template: ../../src/functions/azure-iot-alerting-actions-function/templates/deploy-env.yaml
-  - template: ../../src/functions/azure-iot-messaging-functions/templates/deploy-env.yaml
