@@ -277,7 +277,7 @@ function writeToTableStorage(){
             Write-Output "Finished creating a new IotHub, however Table Storage could not be updated. This tenant may be in a failing state, or may already be deleted.";
         }    
 }
-
+#Adding the users as SysAdmins for Newly created Tenant
 function addUsersAsAdminsForNewTenant(){
     try{
         Write-Output ("Trying to write to 'User' table storage")
