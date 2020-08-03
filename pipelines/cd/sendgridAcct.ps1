@@ -78,7 +78,11 @@ function CreateSendGridAccount() {
     }
 
     try{
-        # accept the legal terms to purchase from market place, required for the first time
+
+        Write-Output "Getting from market place" 
+        Get-AzureRmMarketplaceTerms -Publisher 'Sendgrid' -Product 'sendgrid_azure' -Name 'free' 
+        Write-Output "After get-market place"
+         # accept the legal terms to purchase from market place, required for the first time
         Get-AzureRmMarketplaceTerms -Publisher 'Sendgrid' -Product 'sendgrid_azure' -Name 'free' | Set-AzureRmMarketplaceTerms -Accept -ErrorAction Stop
         # register the namespace 'Sendgrid.Email'
         Register-AzureRmResourceProvider -ProviderNamespace Sendgrid.Email
