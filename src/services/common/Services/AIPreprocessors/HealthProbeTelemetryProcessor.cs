@@ -35,7 +35,7 @@ namespace Mmm.Iot.Common.Services.AIPreprocessors
             else if (item is TraceTelemetry trace)
             {
                 if (trace.Properties.TryGetValue("RequestPath", out var requestPath) &&
-                    (requestPath == "/v1/status/ping" || requestPath == "/v1/status"))
+                    (requestPath.Contains("/v1/status/ping") || requestPath.Contains("/v1/status")))
                 {
                     return;
                 }
@@ -43,7 +43,7 @@ namespace Mmm.Iot.Common.Services.AIPreprocessors
             else if (item is DependencyTelemetry)
             {
                 var dependency = item as DependencyTelemetry;
-                if (dependency.Context.Operation.Name != null && dependency.Context.Operation.Name.Contains("Status/Get"))
+                if (dependency?.Context?.Operation?.Name != null && dependency.Context.Operation.Name.Contains("Status/Get"))
                 {
                     return;
                 }
