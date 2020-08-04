@@ -1020,9 +1020,9 @@ jobs:
             az functionapp config appsettings set --name $functionName \
               --settings \
                 "CosmosDbConnectionString"="$cosmosDbConn" \
-                "AppConfigurationConnectionString"="appConfigurationConnectionString" \
-                "TableStorageConnectionString"="blobStorageConnString" \
-                "AzureStorageConnectionString"="blobStorageConnString" \
+                "AppConfigurationConnectionString"="$appConfigurationConnectionString" \
+                "TableStorageConnectionString"="$blobStorageConnString" \
+                "AzureStorageConnectionString"="$blobStorageConnString" \
               --resource-group $(resourceGroupName)
 
   - job: automationAccount
