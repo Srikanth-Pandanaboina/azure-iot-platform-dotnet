@@ -1023,6 +1023,7 @@ jobs:
                 "AppConfigurationConnectionString"="$appConfigurationConnectionString" \
                 "TableStorageConnectionString"="$blobStorageConnString" \
                 "AzureStorageConnectionString"="$blobStorageConnString" \
+                "DeploymentsDatabaseId"="pcs-storage" \
               --resource-group $(resourceGroupName)
 
   - job: automationAccount
