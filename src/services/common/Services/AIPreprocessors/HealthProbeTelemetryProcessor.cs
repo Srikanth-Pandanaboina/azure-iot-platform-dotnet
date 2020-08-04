@@ -26,8 +26,8 @@ namespace Mmm.Iot.Common.Services.AIPreprocessors
             if (item is RequestTelemetry)
             {
                 var req = item as RequestTelemetry;
-                if (req != null && (req.Url.AbsoluteUri.Contains("/ping") ||
-                    req.Url.AbsoluteUri.Contains("v1/status")))
+                if (req != null && (req.Url.AbsoluteUri.Contains("/ping", StringComparison.InvariantCultureIgnoreCase) ||
+                    req.Url.AbsoluteUri.Contains("v1/status", StringComparison.InvariantCultureIgnoreCase)))
                 {
                     return;
                 }
@@ -35,7 +35,7 @@ namespace Mmm.Iot.Common.Services.AIPreprocessors
             else if (item is TraceTelemetry trace)
             {
                 if (trace.Properties.TryGetValue("RequestPath", out var requestPath) &&
-                    (requestPath.Contains("/v1/status/ping") || requestPath.Contains("/v1/status")))
+                    (requestPath.Contains("/v1/status/ping", StringComparison.InvariantCultureIgnoreCase) || requestPath.Contains("/v1/status", StringComparison.InvariantCultureIgnoreCase)))
                 {
                     return;
                 }
@@ -43,7 +43,7 @@ namespace Mmm.Iot.Common.Services.AIPreprocessors
             else if (item is DependencyTelemetry)
             {
                 var dependency = item as DependencyTelemetry;
-                if (dependency?.Context?.Operation?.Name != null && dependency.Context.Operation.Name.Contains("Status/Get"))
+                if (dependency?.Context?.Operation?.Name != null && dependency.Context.Operation.Name.Contains("Status/Get", StringComparison.InvariantCultureIgnoreCase))
                 {
                     return;
                 }
