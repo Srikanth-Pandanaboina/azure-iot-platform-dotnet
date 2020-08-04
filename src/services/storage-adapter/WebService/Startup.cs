@@ -33,8 +33,8 @@ namespace Mmm.Iot.StorageAdapter.WebService
             {
                 c.SwaggerDoc($"v1", new OpenApiInfo { Title = "Storage Adapter API", Version = "v1" });
             });
-            services.AddMvc().AddControllersAsServices().AddNewtonsoftJson();
             services.AddApplicationInsightsTelemetryProcessor<HealthProbeTelemetryProcessor>();
+            services.AddMvc().AddControllersAsServices().AddNewtonsoftJson();
             services.AddHttpContextAccessor();
             this.ApplicationContainer = new DependencyResolution().Setup(services, this.Configuration);
             return new AutofacServiceProvider(this.ApplicationContainer);
