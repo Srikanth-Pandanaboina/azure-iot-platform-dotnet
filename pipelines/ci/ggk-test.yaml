@@ -134,7 +134,6 @@ stages:
               --configuration $(dotnetBuildConfiguration)
               --runtime $(dotnetProductionRuntimeId)
               /p:TargetLatestRuntimePatch=true
-              /p:VersionPrefix=$(serenityVersion).$(Build.BuildId)
             displayName: Build assemblies
 
           - task: CopyFiles@2
