@@ -98,6 +98,13 @@ stages:
                 exit 1
               fi
 
+              echo "AKS agent VM size: '$(aksAgentVmSize)'"
+              if [ -z "$(aksAgentVmSize)" ]
+              then
+                echo "A value for the 'aksAgentVmSize' variable must be provided" > /dev/stderr
+                exit 1
+              fi
+
               echo "Test pipeline run ID: '$(testPipelineRunId)'"
               if [ -z "$(testPipelineRunId)" ]
               then
