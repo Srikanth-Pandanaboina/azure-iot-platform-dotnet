@@ -157,7 +157,7 @@
                     "appSettings": [
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[reference(resourceId('microsoft.insights/components/', parameters('storageAccountName')), '2015-05-01').primaryConnectionString]"
+                            "value": "[reference(resourceId('Microsoft.Storage/storageAccounts/', parameters('storageAccountName')), '2015-05-01').primaryConnectionString]"
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -181,7 +181,7 @@
                         },
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[reference(resourceId('microsoft.insights/components/', parameters('storageAccountName')), '2015-05-01').primaryConnectionString]"
+                            "value": "[reference(resourceId('Microsoft.Storage/storageAccounts/', parameters('storageAccountName')), '2015-05-01').primaryConnectionString]"
                         }
                     ]
                 }
