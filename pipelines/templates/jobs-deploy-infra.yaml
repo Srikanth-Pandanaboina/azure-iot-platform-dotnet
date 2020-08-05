@@ -844,15 +844,16 @@ jobs:
             telemetryEvConn=$(az keyvault secret show --name "TenantManagerService--TelemetryEventHubConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
             twinchangeEvConn=$(az keyvault secret show --name "TenantManagerService--TwinChangeEventHubConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
             storageAccountConn=$(az keyvault secret show --name "Global--StorageAccountConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
+
+            # These three config values using $storageAccountConn are typically automatically added by Azure
+            # Unfortunately, there currently exists a problem where the value of that connection string is missing the necessary piece
+            # EndpointSuffix=core.windows.net
+            # Manually adding these config values fixes this
             az functionapp config appsettings set --name $devicetwinPropfn \
               --settings \
-                # These three config values using $storageAccountConn are typically automatically added by Azure
-                # Unfortunately, there currently exists a problem where the value of that connection string is missing the necessary piece
-                # EndpointSuffix=core.windows.net
-                # Manually adding these config values fixes this:
                 "AzureWebJobsDashboard"="$storageAccountConn" \
                 "AzureWebJobsStorage"="$storageAccountConn" \
-                ###### END STORAGE ACCOUNT CONN OVERWRITE #######
+                "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING"="$storageAccountConn" \
                 "CosmosDbConnectionString"="$cosmosDbConn" \
                 "TelemetryEventHubConnectionString"="$telemetryEvConn" \
                 "LifecycleEventHubConnectionString"="$lifecycleEvConn" \
@@ -920,16 +921,16 @@ jobs:
           inlineScript: |-
             functionName=${{parameters.applicationCode}}-appconfigfuncapp-${{parameters.environmentCategory}}
             storageAccountConn=$(az keyvault secret show --name "Global--StorageAccountConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
-            az functionapp config appsettings set \
-              --name $functionName \
+
+            # These three config values using $storageAccountConn are typically automatically added by Azure
+            # Unfortunately, there currently exists a problem where the value of that connection string is missing the necessary piece
+            # EndpointSuffix=core.windows.net
+            # Manually adding these config values fixes this
+            az functionapp config appsettings set --name $functionName \
               --settings \
-                # These three config values using $storageAccountConn are typically automatically added by Azure
-                # Unfortunately, there currently exists a problem where the value of that connection string is missing the necessary piece
-                # EndpointSuffix=core.windows.net
-                # Manually adding these config values fixes this:
                 "AzureWebJobsDashboard"="$storageAccountConn" \
                 "AzureWebJobsStorage"="$storageAccountConn" \
-                ###### END STORAGE ACCOUNT CONN OVERWRITE #######
+                "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING"="$storageAccountConn" \
               --resource-group $(resourceGroupName)
 
   - job: function3
@@ -988,16 +989,15 @@ jobs:
             actionsEvConn=$(az keyvault secret show --name "AlertingActionsFunction--ActionsEventHubConnectionString" --vault-name $(keyVaultName) --query [value] --output tsv)
             sendGridApiKey=$(az keyvault secret show --name "IdentityGatewayService--SendGridApiKey" --vault-name $(keyVaultName) --query [value] --output tsv)
             storageAccountConn=$(az keyvault secret show --name "Global--StorageAccountConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
-            az functionapp config appsettings set \
-              --name $functionName \
+
+            # These three config values using $storageAccountConn are typically automatically added by Azure
+            # Unfortunately, there currently exists a problem where the value of that connection string is missing the necessary piece
+            # EndpointSuffix=core.windows.net
+            # Manually adding these config values fixes this
+            az functionapp config appsettings set --name $functionName \
               --settings \
-                # These three config values using $storageAccountConn are typically automatically added by Azure
-                # Unfortunately, there currently exists a problem where the value of that connection string is missing the necessary piece
-                # EndpointSuffix=core.windows.net
-                # Manually adding these config values fixes this:
                 "AzureWebJobsDashboard"="$storageAccountConn" \
                 "AzureWebJobsStorage"="$storageAccountConn" \
-                ###### END STORAGE ACCOUNT CONN OVERWRITE #######
                 "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING"="$storageAccountConn" \
                 "ActionsEventHubConnectionString"="$actionsEvConn" \
                 "SendGridApiKey"="$sendGridApiKey" \
