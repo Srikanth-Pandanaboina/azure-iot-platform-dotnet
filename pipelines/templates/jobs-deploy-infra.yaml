@@ -846,7 +846,13 @@ jobs:
             storageAccountConn=$(az keyvault secret show --name "Global--StorageAccountConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
             az functionapp config appsettings set --name $devicetwinPropfn \
               --settings \
+                # These three config values using $storageAccountConn are typically automatically added by Azure
+                # Unfortunately, there currently exists a problem where the value of that connection string is missing the necessary piece
+                # EndpointSuffix=core.windows.net
+                # Manually adding these config values fixes this:
+                "AzureWebJobsDashboard"="$storageAccountConn" \
                 "AzureWebJobsStorage"="$storageAccountConn" \
+                ###### END STORAGE ACCOUNT CONN OVERWRITE #######
                 "CosmosDbConnectionString"="$cosmosDbConn" \
                 "TelemetryEventHubConnectionString"="$telemetryEvConn" \
                 "LifecycleEventHubConnectionString"="$lifecycleEvConn" \
@@ -917,7 +923,13 @@ jobs:
             az functionapp config appsettings set \
               --name $functionName \
               --settings \
+                # These three config values using $storageAccountConn are typically automatically added by Azure
+                # Unfortunately, there currently exists a problem where the value of that connection string is missing the necessary piece
+                # EndpointSuffix=core.windows.net
+                # Manually adding these config values fixes this:
+                "AzureWebJobsDashboard"="$storageAccountConn" \
                 "AzureWebJobsStorage"="$storageAccountConn" \
+                ###### END STORAGE ACCOUNT CONN OVERWRITE #######
               --resource-group $(resourceGroupName)
 
   - job: function3
@@ -979,7 +991,14 @@ jobs:
             az functionapp config appsettings set \
               --name $functionName \
               --settings \
+                # These three config values using $storageAccountConn are typically automatically added by Azure
+                # Unfortunately, there currently exists a problem where the value of that connection string is missing the necessary piece
+                # EndpointSuffix=core.windows.net
+                # Manually adding these config values fixes this:
+                "AzureWebJobsDashboard"="$storageAccountConn" \
                 "AzureWebJobsStorage"="$storageAccountConn" \
+                ###### END STORAGE ACCOUNT CONN OVERWRITE #######
+                "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING"="$storageAccountConn" \
                 "ActionsEventHubConnectionString"="$actionsEvConn" \
                 "SendGridApiKey"="$sendGridApiKey" \
                 "ActionsEventHubConsumerGroup"="alertingactions" \
