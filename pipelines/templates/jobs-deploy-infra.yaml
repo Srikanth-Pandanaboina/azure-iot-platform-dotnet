@@ -839,12 +839,14 @@ jobs:
           scriptType: bash
           inlineScript: |-
             devicetwinPropfn=$(functionApp1Name)
-            cosmosDbConn=$(az keyvault secret show --name "Global--CosmosDb--DocumentDbConnectionString" --vault-name $(keyVaultName) | grep value | awk -F '\"' '{print $4}')
-            lifecycleEvConn=$(az keyvault secret show --name "TenantManagerService--LifecycleEventHubConnectionString" --vault-name $(keyVaultName) | grep value | awk -F '\"' '{print $4}')
-            telemetryEvConn=$(az keyvault secret show --name "TenantManagerService--TelemetryEventHubConnectionString" --vault-name $(keyVaultName) | grep value | awk -F '\"' '{print $4}')
-            twinchangeEvConn=$(az keyvault secret show --name "TenantManagerService--TwinChangeEventHubConnectionString" --vault-name $(keyVaultName) | grep value | awk -F '\"' '{print $4}')
+            cosmosDbConn=$(az keyvault secret show --name "Global--CosmosDb--DocumentDbConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
+            lifecycleEvConn=$(az keyvault secret show --name "TenantManagerService--LifecycleEventHubConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
+            telemetryEvConn=$(az keyvault secret show --name "TenantManagerService--TelemetryEventHubConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
+            twinchangeEvConn=$(az keyvault secret show --name "TenantManagerService--TwinChangeEventHubConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
+            storageAccountConn=$(az keyvault secret show --name "Global--StorageAccountConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
             az functionapp config appsettings set --name $devicetwinPropfn \
               --settings \
+                "AzureWebJobsStorage"="$storageAccountConn" \
                 "CosmosDbConnectionString"="$cosmosDbConn" \
                 "TelemetryEventHubConnectionString"="$telemetryEvConn" \
                 "LifecycleEventHubConnectionString"="$lifecycleEvConn" \
@@ -903,6 +905,21 @@ jobs:
           deploymentPartialName: $(functionApp2PartialName)
           resourceGroupName: $(resourceGroupName)
 
+      - task: AzureCLI@2
+        displayName: Set app settings for App Config Function
+        inputs:
+          azureSubscription: ${{parameters.subscriptionName}}
+          scriptLocation: inlineScript
+          scriptType: bash
+          inlineScript: |-
+            functionName=${{parameters.applicationCode}}-appconfigfuncapp-${{parameters.environmentCategory}}
+            storageAccountConn=$(az keyvault secret show --name "Global--StorageAccountConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
+            az functionapp config appsettings set \
+              --name $functionName \
+              --settings \
+                "AzureWebJobsStorage"="$storageAccountConn" \
+              --resource-group $(resourceGroupName)
+
   - job: function3
     displayName: Create Alerting Actions Function
     dependsOn:
@@ -958,9 +975,11 @@ jobs:
             functionName=${{parameters.applicationCode}}-alertingactionsfuncapp-${{parameters.environmentCategory}}
             actionsEvConn=$(az keyvault secret show --name "AlertingActionsFunction--ActionsEventHubConnectionString" --vault-name $(keyVaultName) --query [value] --output tsv)
             sendGridApiKey=$(az keyvault secret show --name "IdentityGatewayService--SendGridApiKey" --vault-name $(keyVaultName) --query [value] --output tsv)
+            storageAccountConn=$(az keyvault secret show --name "Global--StorageAccountConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
             az functionapp config appsettings set \
               --name $functionName \
               --settings \
+                "AzureWebJobsStorage"="$storageAccountConn" \
                 "ActionsEventHubConnectionString"="$actionsEvConn" \
                 "SendGridApiKey"="$sendGridApiKey" \
                 "ActionsEventHubConsumerGroup"="alertingactions" \
