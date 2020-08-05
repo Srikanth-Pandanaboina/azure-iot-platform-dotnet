@@ -844,16 +844,8 @@ jobs:
             telemetryEvConn=$(az keyvault secret show --name "TenantManagerService--TelemetryEventHubConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
             twinchangeEvConn=$(az keyvault secret show --name "TenantManagerService--TwinChangeEventHubConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
             storageAccountConn=$(az keyvault secret show --name "Global--StorageAccountConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
-
-            # These three config values using $storageAccountConn are typically automatically added by Azure
-            # Unfortunately, there currently exists a problem where the value of that connection string is missing the necessary piece
-            # EndpointSuffix=core.windows.net
-            # Manually adding these config values fixes this
             az functionapp config appsettings set --name $devicetwinPropfn \
               --settings \
-                "AzureWebJobsDashboard"="$storageAccountConn" \
-                "AzureWebJobsStorage"="$storageAccountConn" \
-                "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING"="$storageAccountConn" \
                 "CosmosDbConnectionString"="$cosmosDbConn" \
                 "TelemetryEventHubConnectionString"="$telemetryEvConn" \
                 "LifecycleEventHubConnectionString"="$lifecycleEvConn" \
@@ -912,27 +904,6 @@ jobs:
           deploymentPartialName: $(functionApp2PartialName)
           resourceGroupName: $(resourceGroupName)
 
-      - task: AzureCLI@2
-        displayName: Set app settings for App Config Function
-        inputs:
-          azureSubscription: ${{parameters.subscriptionName}}
-          scriptLocation: inlineScript
-          scriptType: bash
-          inlineScript: |-
-            functionName=${{parameters.applicationCode}}-appconfigfuncapp-${{parameters.environmentCategory}}
-            storageAccountConn=$(az keyvault secret show --name "Global--StorageAccountConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
-
-            # These three config values using $storageAccountConn are typically automatically added by Azure
-            # Unfortunately, there currently exists a problem where the value of that connection string is missing the necessary piece
-            # EndpointSuffix=core.windows.net
-            # Manually adding these config values fixes this
-            az functionapp config appsettings set --name $functionName \
-              --settings \
-                "AzureWebJobsDashboard"="$storageAccountConn" \
-                "AzureWebJobsStorage"="$storageAccountConn" \
-                "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING"="$storageAccountConn" \
-              --resource-group $(resourceGroupName)
-
   - job: function3
     displayName: Create Alerting Actions Function
     dependsOn:
@@ -989,16 +960,8 @@ jobs:
             actionsEvConn=$(az keyvault secret show --name "AlertingActionsFunction--ActionsEventHubConnectionString" --vault-name $(keyVaultName) --query [value] --output tsv)
             sendGridApiKey=$(az keyvault secret show --name "IdentityGatewayService--SendGridApiKey" --vault-name $(keyVaultName) --query [value] --output tsv)
             storageAccountConn=$(az keyvault secret show --name "Global--StorageAccountConnectionString" --vault-name $(keyVaultName) --query "value" --output tsv)
-
-            # These three config values using $storageAccountConn are typically automatically added by Azure
-            # Unfortunately, there currently exists a problem where the value of that connection string is missing the necessary piece
-            # EndpointSuffix=core.windows.net
-            # Manually adding these config values fixes this
             az functionapp config appsettings set --name $functionName \
               --settings \
-                "AzureWebJobsDashboard"="$storageAccountConn" \
-                "AzureWebJobsStorage"="$storageAccountConn" \
-                "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING"="$storageAccountConn" \
                 "ActionsEventHubConnectionString"="$actionsEvConn" \
                 "SendGridApiKey"="$sendGridApiKey" \
                 "ActionsEventHubConsumerGroup"="alertingactions" \

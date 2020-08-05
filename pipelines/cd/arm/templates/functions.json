@@ -157,11 +157,7 @@
                     "appSettings": [
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2015-05-01-preview').key1,';')]"
-                        },
-                        {
-                            "name": "AzureWebJobsDashboard",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2015-05-01-preview').key1,';')]"
+                            "value": "[reference(resourceId('microsoft.insights/components', parameters('storageAccountName')), '2015-05-01'.primaryConnectionString]"
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -185,8 +181,8 @@
                         },
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2015-05-01-preview').key1,';')]"
-                        }
+                            "value": "[reference(resourceId('microsoft.insights/components', parameters('storageAccountName')), '2015-05-01'.primaryConnectionString]"
+                        },
                     ]
                 }
             },
