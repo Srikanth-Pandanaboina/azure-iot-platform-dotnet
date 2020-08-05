@@ -117,7 +117,8 @@
             "type": "Microsoft.Web/serverfarms",
             "name": "[parameters('functionAppName')]",
             "location": "[resourceGroup().location]",
-            "apiVersion": "2016-09-01",
+            "apiVersion": "2019-08-01",
+            "kind": "Linux",
             "sku": {
                 "name": "[parameters('skuName')]",
                 "tier": "[parameters('skuTier')]",
@@ -129,7 +130,8 @@
             },
             "properties": {
                 "name": "[parameters('functionAppName')]",
-                "numberOfWorkers": 1
+                "numberOfWorkers": 1,
+                "reserved": true
             }
         },
         {
