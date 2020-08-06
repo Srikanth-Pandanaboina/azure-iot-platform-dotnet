@@ -871,7 +871,7 @@ jobs:
             az functionapp config appsettings delete \
               --setting-names "MSDEPLOY_RENAME_LOCKED_FILES" \
               --name $devicetwinPropfn \
-              --resource-group $(resourceGroupName) \
+              --resource-group $(resourceGroupName)
 
   - job: function2
     displayName: Create App Config Function

@@ -143,6 +143,7 @@
                 "enabled": true,
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('functionAppName'))]",
                 "reserved": false,
+                "appOffline": false,
                 "scmSiteAlsoStopped": false,
                 "hostingEnvironmentProfile": null,
                 "clientAffinityEnabled": false,
