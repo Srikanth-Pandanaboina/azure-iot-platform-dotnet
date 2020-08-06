@@ -68,20 +68,6 @@ export class Packages extends Component {
 
     getSoftSelectId = ({ id } = "") => id;
 
-    onSoftSelectChange = (packageId, rowData) => {
-        //Note: only the Id is reliable, rowData may be out of date
-        this.props.logEvent(
-            toDiagnosticsModel("Packages_GridRowClick", {
-                id: packageId,
-                displayName: rowData.name,
-            })
-        );
-        this.setState({
-            openFlyoutName: "package-json",
-            packageJson: rowData.content,
-        });
-    };
-
     render() {
         const {
                 t,
@@ -97,7 +83,6 @@ export class Packages extends Component {
                 onContextMenuChange: this.onContextMenuChange,
                 t: this.props.t,
                 getSoftSelectId: this.getSoftSelectId,
-                onSoftSelectChange: this.onSoftSelectChange,
             };
 
         return (
