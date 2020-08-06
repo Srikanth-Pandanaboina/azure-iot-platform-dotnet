@@ -860,6 +860,19 @@ jobs:
                 "BatchWriteDelay"="85" \
               --resource-group $(resourceGroupName)
 
+      - task: AzureCLI@2
+        displayName: Remove MSDEPLOY_RENAME_LOCKED_FILES
+        inputs:
+          azureSubscription: ${{parameters.subscriptionName}}
+          scriptLocation: inlineScript
+          scriptType: bash
+          inlineScript: |-
+            devicetwinPropfn=$(functionApp1Name)
+            az functionapp config appsettings delete \
+              --setting-names "MSDEPLOY_RENAME_LOCKED_FILES" \
+              --name $devicetwinPropfn \
+              --resource-group $(resourceGroupName) \
+
   - job: function2
     displayName: Create App Config Function
     dependsOn:
