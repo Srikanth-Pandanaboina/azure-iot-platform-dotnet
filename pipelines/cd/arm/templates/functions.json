@@ -181,10 +181,6 @@
                         },
                         {
                             "name": "WEBSITE_RUN_FROM_PACKAGE",
-                            "value": "0"
-                        },
-                        {
-                            "name": "MSDEPLOY_RENAME_LOCKED_FILES",
                             "value": "1"
                         }
                     ]
