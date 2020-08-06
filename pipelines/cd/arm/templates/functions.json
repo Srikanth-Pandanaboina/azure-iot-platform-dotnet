@@ -180,12 +180,12 @@
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=core.windows.net')]"
                         },
                         {
-                          "name": "WEBSITE_RUN_FROM_PACKAGE",
-                          "value": "1"
+                            "name": "WEBSITE_RUN_FROM_PACKAGE",
+                            "value": "0"
                         },
                         {
-                          "name": "MSDEPLOY_RENAME_LOCKED_FILES",
-                          "value": "0"
+                            "name": "MSDEPLOY_RENAME_LOCKED_FILES",
+                            "value": "1"
                         }
                     ]
                 }
