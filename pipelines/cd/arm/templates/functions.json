@@ -168,10 +168,6 @@
                             "value": "[parameters('runtime')]"
                         },
                         {
-                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                            "value": "[parameters('nodeVersion')]"
-                        },
-                        {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                             "value": "[reference(resourceId('microsoft.insights/components/', parameters('appInsightsName')), '2015-05-01').InstrumentationKey]"
                         },
@@ -182,6 +178,10 @@
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=core.windows.net')]"
+                        },
+                        {
+                          "name": "WEBSITE_RUN_FROM_PACKAGE",
+                          "value": "1"
                         }
                     ]
                 }
