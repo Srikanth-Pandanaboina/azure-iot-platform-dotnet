@@ -157,7 +157,7 @@
                     "appSettings": [
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';AccountKey=', listKeys(resourceId(resourceGroup().name),'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=core.windows.net')]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').key1,';EndpointSuffix=core.windows.net')]"
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -181,7 +181,7 @@
                         },
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';AccountKey=', listKeys(resourceId(resourceGroup().name),'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=core.windows.net')]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').key1,';EndpointSuffix=core.windows.net')]"
                         }
                     ]
                 }
