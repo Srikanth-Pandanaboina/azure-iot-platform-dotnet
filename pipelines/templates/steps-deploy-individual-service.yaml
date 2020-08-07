@@ -82,7 +82,7 @@ steps:
       overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},type=green,deployment.image.tag=${{parameters.imageTag}},deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.serviceName}}+'Green'
     
       
-  - task: HelmDeploy@
+  - task: HelmDeploy@0
     inputs:
       connectionType: Azure Resource Manager
       azureSubscription: ${{parameters.subscriptionName}}
