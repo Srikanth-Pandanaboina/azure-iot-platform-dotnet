@@ -860,18 +860,18 @@ jobs:
                 "BatchWriteDelay"="85" \
               --resource-group $(resourceGroupName)
 
-      - task: AzureCLI@2
-        displayName: Remove MSDEPLOY_RENAME_LOCKED_FILES
-        inputs:
-          azureSubscription: ${{parameters.subscriptionName}}
-          scriptLocation: inlineScript
-          scriptType: bash
-          inlineScript: |-
-            devicetwinPropfn=$(functionApp1Name)
-            az functionapp config appsettings delete \
-              --setting-names "MSDEPLOY_RENAME_LOCKED_FILES" \
-              --name $devicetwinPropfn \
-              --resource-group $(resourceGroupName)
+      # - task: AzureCLI@2
+      #   displayName: Remove MSDEPLOY_RENAME_LOCKED_FILES
+      #   inputs:
+      #     azureSubscription: ${{parameters.subscriptionName}}
+      #     scriptLocation: inlineScript
+      #     scriptType: bash
+      #     inlineScript: |-
+      #       devicetwinPropfn=$(functionApp1Name)
+      #       az functionapp config appsettings delete \
+      #         --setting-names "MSDEPLOY_RENAME_LOCKED_FILES" \
+      #         --name $devicetwinPropfn \
+      #         --resource-group $(resourceGroupName)
 
   - job: function2
     displayName: Create App Config Function
@@ -1035,14 +1035,16 @@ jobs:
           archiveFile: $(Build.SourcesDirectory)/$(functionName).zip
 
 
-      - task: AzureRMWebAppDeployment@4
+      - task: AzureFunctionApp@1
         displayName: Deploy Functions
         inputs:
           appType: functionApp
           azureSubscription: ${{parameters.subscriptionName}}
-          WebAppName: $(appName)
-          deploymentMethod: 'runFromPackage' # supports zipDeploy as well
-          Package: $(Build.SourcesDirectory)/$(functionName).zip
+          deploymentType: 'runFromPackage'
+          appName: $(appName)
+          package: $(Build.SourcesDirectory)/$(functionName).zip
+          runtimeStack: 'DOCKER|mcr.microsoft.com/azure-functions/dotnet:3.1'
+
 
   - job: automationAccount
     displayName: Provision Azure Automation and Sendgrid accounts
