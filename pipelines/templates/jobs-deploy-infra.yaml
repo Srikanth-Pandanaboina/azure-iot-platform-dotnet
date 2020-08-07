@@ -1034,18 +1034,15 @@ jobs:
           includeRootFolder: false
           archiveFile: $(Build.SourcesDirectory)/$(functionName).zip
 
-      - task: AzureRmWebAppDeployment@3
-        displayName: Deploy function
+
+      - task: AzureRMWebAppDeployment@4
+        displayName: Deploy Functions
         inputs:
-          azureSubscription: ${{parameters.subscriptionName}}
           appType: functionApp
+          azureSubscription: ${{parameters.subscriptionName}}
           WebAppName: $(appName)
-          DeployToSlotFlag: false
+          deploymentMethod: 'runFromPackage' # supports zipDeploy as well
           Package: $(Build.SourcesDirectory)/$(functionName).zip
-          TakeAppOfflineFlag: true
-          UseWebDeploy: true
-          AdditionalArguments: -useChecksum
-          RenameFilesFlag: true
 
   - job: automationAccount
     displayName: Provision Azure Automation and Sendgrid accounts
