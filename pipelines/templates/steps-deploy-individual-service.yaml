@@ -52,7 +52,7 @@ steps:
       chartPath: charts/mmm-iot-service
       releaseName: ${{parameters.serviceName}}
       overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=blue,deployment.enabled=false,service.enabled=true
-  - task: HelmDeploy@1
+  - task: HelmDeploy@0
     displayName: Creation Blue application deployment
     inputs:
       connectionType: Azure Resource Manager
@@ -67,7 +67,7 @@ steps:
       overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},deployment.image.tag=${{parameters.imageTag}},type=blue,deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.serviceName}}+'Blue'
 
 
-  - task: HelmDeploy@2
+  - task: HelmDeploy@0
     displayName: Creation of Green Deployment
     inputs:
       connectionType: Azure Resource Manager
@@ -82,7 +82,7 @@ steps:
       overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},type=green,deployment.image.tag=${{parameters.imageTag}},deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.serviceName}}+'Green'
     
       
-  - task: HelmDeploy@3
+  - task: HelmDeploy@
     inputs:
       connectionType: Azure Resource Manager
       azureSubscription: ${{parameters.subscriptionName}}
