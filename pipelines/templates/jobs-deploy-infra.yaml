@@ -1040,7 +1040,6 @@ jobs:
         inputs:
           appType: functionApp
           azureSubscription: ${{parameters.subscriptionName}}
-          deploymentType: 'runFromPackage'
           appName: $(appName)
           package: $(Build.SourcesDirectory)/$(functionName).zip
           runtimeStack: 'DOCKER|mcr.microsoft.com/azure-functions/dotnet:3.0'
