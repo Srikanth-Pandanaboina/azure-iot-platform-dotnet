@@ -32,6 +32,6 @@ app.kubernetes.io/version: {{ .Values.appVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-/* {{- define "service.deployment.image.repository" -}}
+{{- define "service.deployment.image.repository" -}}
   {{- include "service.name" . | cat "azureiot3m/" | nospace -}}
-{{- end -}} */
+{{- end -}}

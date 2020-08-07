@@ -18,8 +18,8 @@ deployment:
   imagePullSecrets: []
   replicaCount: 1
   image:
-    repository: azureiot3m/webui
-    tag: 65468
+    repository: 
+    tag: 
     pullPolicy: Always
 ingress:
   enabled: false

@@ -38,7 +38,51 @@ steps:
       command: init
       arguments: --force-upgrade
 
+
   - task: HelmDeploy@0
+    displayName: Creation Of Service for first time
+    inputs:
+      connectionType: Azure Resource Manager
+      azureSubscription: 3M-CRSLAD16-BBIoTP-Dev
+      azureResourceGroup: rg-iot-ggk-dev
+      kubernetesCluster: ggktech-aks-dev
+      namespace: default
+      command: install
+      chartType: FilePath
+      chartPath: charts/mmm-iot-service
+      releaseName: ${{parameters.serviceName}}
+      overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=blue,deployment.enabled=false,service.enabled=true
+  - task: HelmDeploy@1
+    displayName: Creation Blue application deployment
+    inputs:
+      connectionType: Azure Resource Manager
+      azureSubscription: 3M-CRSLAD16-BBIoTP-Dev
+      azureResourceGroup: rg-iot-ggk-dev
+      kubernetesCluster: ggktech-aks-dev
+      namespace: default
+      command: install
+      chartType: FilePath
+      chartPath: charts/mmm-iot-service
+      releaseName: ${{parameters.serviceName}}
+      overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},deployment.image.tag=${{parameters.imageTag}},type=blue,deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.serviceName}}
+
+
+  - task: HelmDeploy@2
+    displayName: Creation of Green Deployment
+    inputs:
+      connectionType: Azure Resource Manager
+      azureSubscription: 3M-CRSLAD16-BBIoTP-Dev
+      azureResourceGroup: rg-iot-ggk-dev
+      kubernetesCluster: ggktech-aks-dev
+      namespace: default
+      command: install
+      chartType: FilePath
+      chartPath: charts/mmm-iot-service
+      releaseName: ${{parameters.serviceName}}
+      overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},type=green,deployment.image.tag=${{parameters.imageTag}},deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.serviceName}}
+    
+      
+  - task: HelmDeploy@3
     inputs:
       connectionType: Azure Resource Manager
       azureSubscription: ${{parameters.subscriptionName}}
@@ -50,7 +94,7 @@ steps:
       chartType: FilePath
       chartPath: charts/mmm-iot-service
       releaseName: ${{parameters.serviceName}}
-      overrideValues: deployment.image.tag=${{parameters.imageTag}},nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}}
+      overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=green,deployment.enabled=false,service.enabled=true
       force: true
       arguments: --cleanup-on-fail --set-string gitSha=$(Build.SourceVersion)
       waitForExecution: true
