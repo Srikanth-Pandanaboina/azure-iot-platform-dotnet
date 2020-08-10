@@ -34,16 +34,6 @@ namespace Mmm.Iot.Common.Services.External.StorageAdapter
             return await this.RequestHelper.ProcessRequestAsync(HttpMethod.Post, url, data);
         }
 
-        public async Task<ValueApiModel> CreateAsync(string collectionId, string key, string value)
-        {
-            string url = this.RequestUrl($"collections/{collectionId}/values/{key}");
-            ValueApiModel data = new ValueApiModel
-            {
-                Data = value,
-            };
-            return await this.RequestHelper.ProcessRequestAsync(HttpMethod.Post, url, data);
-        }
-
         public async Task<ValueApiModel> UpdateAsync(string collectionId, string key, string value, string etag)
         {
             string url = this.RequestUrl($"collections/{collectionId}/values/{key}");
