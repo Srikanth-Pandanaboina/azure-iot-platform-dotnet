@@ -107,7 +107,7 @@ namespace Mmm.Iot.IoTHubManager.WebService.Controllers
 
         [HttpDelete("{id}")]
         [Authorize("DeleteDeployments")]
-        public async Task DeleteAsync(string id, [FromQuery] bool isDelete)
+        public async Task DeleteAsync(string id, [FromQuery] bool isDelete = true)
         {
             await this.deployments.DeleteAsync(id, this.GetClaimsUserDetails(), this.GetTenantId(), isDelete);
         }
@@ -121,7 +121,7 @@ namespace Mmm.Iot.IoTHubManager.WebService.Controllers
 
         [HttpPost("Devices/{id}")]
         [Authorize("ReadAll")]
-        public async Task<DeviceListApiModel> GetDeploymentImpactedDevices(string id, [FromBody] string query, [FromQuery]bool isLatest = false)
+        public async Task<DeviceListApiModel> GetDeploymentImpactedDevices(string id, [FromBody] string query, [FromQuery] bool isLatest = false)
         {
             return new DeviceListApiModel(await this.deployments.GetDeviceListAsync(id, query, isLatest));
         }
