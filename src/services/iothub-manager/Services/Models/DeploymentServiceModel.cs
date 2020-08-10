@@ -97,6 +97,8 @@ namespace Mmm.Iot.IoTHubManager.Services.Models
 
         public string ETag { get; set; }
 
+        public string TargetCondition { get; set; }
+
         private void VerifyConfigurationLabel(Configuration deployment, string labelName)
         {
             if (!deployment.Labels.ContainsKey(labelName))
