@@ -64,7 +64,7 @@ steps:
       command: install
       chartType: FilePath
       chartPath: charts/mmm-iot-service
-      releaseName: ${{parameters.serviceName}}
+      releaseName: ${{parameters.serviceName}}+'blue'
       overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},deployment.image.tag=${{parameters.imageTag}},type=blue,deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.serviceName}}+'Blue'
 
 
@@ -79,7 +79,7 @@ steps:
       command: install
       chartType: FilePath
       chartPath: charts/mmm-iot-service
-      releaseName: ${{parameters.serviceName}}
+      releaseName: ${{parameters.serviceName}}+'Green'
       overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},type=green,deployment.image.tag=${{parameters.imageTag}},deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.serviceName}}+'Green'
     
       
