@@ -88,7 +88,7 @@ export class IoTHubManagerService {
 
     /** Returns deployments */
     static getDeployments() {
-        return HttpClient.get(`${ENDPOINT}deployments/getAll`).map(
+        return HttpClient.get(`${ENDPOINT}deployments`).map(
             toDeploymentsModel
         );
     }

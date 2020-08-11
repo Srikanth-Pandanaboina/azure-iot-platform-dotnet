@@ -176,7 +176,7 @@ namespace Mmm.Iot.IoTHubManager.WebService.Test.Controllers
                 });
             }
 
-            this.deploymentsMock.Setup(x => x.ListAsync()).ReturnsAsync(
+            this.deploymentsMock.Setup(x => x.ListFromStorageAsync()).ReturnsAsync(
                 new DeploymentServiceListModel(deploymentsList));
 
             // Act
