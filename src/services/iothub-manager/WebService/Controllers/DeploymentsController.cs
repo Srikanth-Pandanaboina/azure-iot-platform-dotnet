@@ -88,14 +88,7 @@ namespace Mmm.Iot.IoTHubManager.WebService.Controllers
         [Authorize("ReadAll")]
         public async Task<DeploymentListApiModel> GetAsync()
         {
-            return new DeploymentListApiModel(await this.deployments.ListAsync());
-        }
-
-        [HttpGet("GetAll")]
-        [Authorize("ReadAll")]
-        public async Task<DeploymentListApiModel> GetListAsync()
-        {
-            return new DeploymentListApiModel(await this.deployments.ListAllAsync());
+            return new DeploymentListApiModel(await this.deployments.ListFromStorageAsync());
         }
 
         [HttpGet("{id}")]

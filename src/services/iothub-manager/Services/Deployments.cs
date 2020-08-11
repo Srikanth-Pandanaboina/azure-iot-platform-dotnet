@@ -171,7 +171,7 @@ namespace Mmm.Iot.IoTHubManager.Services
             return new DeploymentServiceListModel(serviceModelDeployments);
         }
 
-        public async Task<DeploymentServiceListModel> ListAllAsync()
+        public async Task<DeploymentServiceListModel> ListFromStorageAsync()
         {
             var deploymentsFromStorage = await this.GetListAsync();
 
