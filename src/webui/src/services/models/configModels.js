@@ -1,4 +1,5 @@
 // Copyright (c) Microsoft. All rights reserved.
+/* eslint-disable no-template-curly-in-string */
 
 import update from "immutability-helper";
 import {
@@ -16,8 +17,14 @@ export const toDeviceGroupModel = function (deviceGroup = {}) {
         conditions: "conditions",
         eTag: "eTag",
         telemetryFormat: "telemetryFormat",
+        isPinned: "isPinned",
+        sortOrder: "sortOrder",
+        supportedMethods: "supportedMethods",
     });
     deviceGroup["telemetryFormat"] = deviceGroup.telemetryFormat || [];
+    deviceGroup["isPinned"] = deviceGroup.isPinned || false;
+    deviceGroup["sortOrder"] = deviceGroup.sortOrder || 0;
+    deviceGroup["supportedMethods"] = deviceGroup.supportedMethods || [];
     return deviceGroup;
 };
 
@@ -40,6 +47,9 @@ export const toCreateDeviceGroupRequestModel = (params = {}) => ({
         toDeviceConditionModel(condition)
     ),
     TelemetryFormat: params.telemetryFormat || [],
+    IsPinned: params.isPinned || false,
+    SortOrder: params.sortOrder || 0,
+    SupportedMethods: params.supportedMethods || [],
 });
 
 export const toUpdateDeviceGroupRequestModel = (params = {}) => ({
@@ -50,6 +60,9 @@ export const toUpdateDeviceGroupRequestModel = (params = {}) => ({
         toDeviceConditionModel(condition)
     ),
     TelemetryFormat: params.telemetryFormat || [],
+    IsPinned: params.isPinned || false,
+    SortOrder: params.sortOrder || 0,
+    SupportedMethods: params.supportedMethods || [],
 });
 
 export const prepareLogoResponse = ({ xhr, response }) => {
@@ -65,6 +78,15 @@ export const prepareLogoResponse = ({ xhr, response }) => {
         }
     }
     return returnObj;
+};
+
+export const toSolutionSettingFirmwareModel = (model = {}) => {
+    return {
+        jsObject: model.jsObject,
+        metadata: {
+            version: model.metadata.version,
+        },
+    };
 };
 
 export const toSolutionSettingThemeModel = (response = {}) =>
@@ -164,3 +186,40 @@ export const toPackageModel = (response = {}) => {
 };
 
 export const toConfigTypesModel = (response = {}) => getItems(response);
+
+export const backupDefaultFirmwareModel = {
+    jsObject: {
+        content: {
+            deviceContent: {
+                "properties.desired.softwareConfig": {
+                    softwareName: "Firmware",
+                    version: "${version}",
+                    softwareURL: "${blobData.FileUri}",
+                    fileName: "${packageFile.name}",
+                    serialNumber: "",
+                    checkSum: "${blobData.CheckSum}",
+                },
+            },
+        },
+        metrics: {
+            queries: {
+                current:
+                    "SELECT deviceId FROM devices WHERE configurations.[[${deployment.id}]].status = 'Applied' AND properties.reported.softwareConfig.version = properties.desired.softwareConfig.version AND properties.reported.softwareConfig.status='Success'",
+                applying:
+                    "SELECT deviceId FROM devices WHERE configurations.[[${deployment.id}]].status = 'Applied' AND ( properties.reported.softwareConfig.status='Downloading' OR properties.reported.softwareConfig.status='Verifying' OR properties.reported.softwareConfig.status='Applying')",
+                rebooting:
+                    "SELECT deviceId FROM devices WHERE configurations.[[${deployment.id}]].status = 'Applied' AND properties.reported.softwareConfig.version = properties.desired.softwareConfig.version AND properties.reported.softwareConfig.status='Rebooting'",
+                error:
+                    "SELECT deviceId FROM devices WHERE configurations.[[${deployment.id}]].status = 'Applied' AND properties.reported.softwareConfig.status='Error'",
+                rolledback:
+                    "SELECT deviceId FROM devices WHERE configurations.[[${deployment.id}]].status = 'Applied' AND properties.reported.softwareConfig.status='RolledBack'",
+            },
+        },
+        targetCondition: "",
+        priority: 20,
+    },
+    metadata: {
+        version:
+            "content//deviceContent//properties.desired.softwareConfig//version",
+    },
+};

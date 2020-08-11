@@ -115,12 +115,56 @@
         "toggleError": "Error updating simulation status",
         "setLogoError": "Error updating logo",
         "simulationLoadError": "Error loading simulation status",
-        "sendDiagnosticsHeader": "Help us improve",
-        "sendDiagnosticsText": "Remote Monitoring can send anonymous information to Microsoft, such as error logs, configuration, and information about how you use the application. No personal information is collected.",
-        "sendDiagnosticsCheckbox": "Yes, share information with Microsoft",
-        "dontSendDiagnosticsCheckbox": "No, don't share information with Microsoft",
+        "sendDiagnosticsCheckbox": "Yes, log diagnostics information",
+        "dontSendDiagnosticsCheckbox": "No, don't log diagnostics information",
         "sendDiagnosticsMicrosoftPrivacyUrl": "Privacy Statement",
-        "diagnosticsLoadError": "Error updating diagnostics preference"
+        "diagnosticsLoadError": "Error updating diagnostics preference",
+        "firmware": {
+            "error": {
+                "noVersion": "The value ${version} must be defined in your firmware JSON template.",
+                "upload": "An error occurred while uploading your firmware JSON template",
+                "invalid": "Invalid firmware JSON template entry",
+                "unknown": "An unknown error occurred.",
+                "retrieval": "An error occurred while retrieving the current firmware JSON template",
+                "doubleSlash": "Firmware JSON template keys may not contain '//'",
+                "reserved": {
+                    "id": "The key 'id' is reserved and cannot be used in the firmware JSON template"
+                }
+            },
+            "name": "Firmware JSON Template",
+            "description": "Upload a firmware JSON template for use with firmware package upload on the packages page.",
+            "edit": "Edit",
+            "save": "Save",
+            "cancel": "Cancel",
+            "variables": {
+                "name": "Template Variables",
+                "summary": "The following template variables may be used in your firmware JSON template. Usage: ${parent.child}, e.g ${blobData.FileUri}",
+                "grid": {
+                    "parent": "Parent",
+                    "child": "Child",
+                    "description": "Description"
+                },
+                "descriptions": {
+                    "version": "Parent only. This variable is required in your template and is overwritten with your firmware package's version value. Usage: ${version}",
+                    "blobData": {
+                        "FileUri": "The Blob Storage URI for your uploaded firmware file",
+                        "CheckSum": "The CheckSum value for your blob storage uploaded file"
+                    },
+                    "packageFile": {
+                        "name": "The name of your uploaded firmware file",
+                        "lastModified": "MS from epoch timestamp",
+                        "lastModifiedDate": "Human readable date timestamp",
+                        "size": "File size in bytes",
+                        "type": "Uploaded file type"
+                    },
+                    "deployment": {
+                        "id": "When deploying your package, this value will be replaced by the ID of your deployment"
+                    }
+                }
+            }
+
+
+        }
     },
     "helpFlyout": {
         "title": "Documentation"
@@ -191,44 +235,55 @@
             "selectedType": "Must be of the selected type"
         }
     },
-  "deviceGroupsFlyout": {
-    "actions": "Actions",
-    "cancel": "Cancel",
-    "title": "Manage device groups",
-    "create": "Create new device group",
-    "deviceGroupName": "Device group name",
-    "new": "New device group",
-    "edit": "Edit a device group",
-    "name": "Name",
-    "namePlaceHolder": "Device group name",
-    "save": "Save",
-    "errorMsg": {
-      "nameCantBeEmpty": "Name is required"
+    "deviceGroupsFlyout": {
+        "actions": "Actions",
+        "cancel": "Cancel",
+        "reset":"Reset",
+        "title": "Manage device groups",
+        "create": "Create new device group",
+        "deviceGroupName": "Device group name",
+        "pinned":"Pinned Device Group",
+        "unpinned":"Unpinned Device Group",
+        "new": "New device group",
+        "edit": "Edit a device group",
+        "name": "Name",
+        "namePlaceHolder": "Device group name",
+        "save": "Save",
+        "errorMsg": {
+            "nameCantBeEmpty": "Name is required"
+        },
+        "delete": {
+            "title": "Delete",
+            "header": "Delete device group",
+            "description": "This action will delete the '{{deviceGroupName}}' device group permanently from the platform.",
+            "confirmNo": "No, do not delete the device group.",
+            "confirmYes": "Yes, please delete the device group.",
+            "summaryHeader": "Summary",
+            "affected": "Affected device group",
+            "cancel": "Cancel",
+            "apply": "Delete",
+            "pending": "Deleting device group... ",
+            "applySuccess": "Device group deleted successfully!",
+            "close": "Close"
+        },
+        "format": {
+            "add": "Add",
+            "keyHeader": "Key",
+            "displayNameHeader": "Display Name",
+            "telemetryFormatHeader": "Telemetry Format",
+            "validation": {
+                "required": "Required fields are not included"
+            }
+        },
+        "supportedMethods": {
+            "add": "Add",
+            "methodHeader": "Method Name",
+            "supportedMethodHeader": "Supported Methods",
+            "validation": {
+                "required": "Required fields are not included"
+            }
+        }
     },
-    "delete": {
-      "title": "Delete",
-      "header": "Delete device group",
-      "description": "This action will delete the '{{deviceGroupName}}' device group permanently from the platform.",
-      "confirmNo": "No, do not delete the device group.",
-      "confirmYes": "Yes, please delete the device group.",
-      "summaryHeader": "Summary",
-      "affected": "Affected device group",
-      "cancel": "Cancel",
-      "apply": "Delete",
-      "pending": "Deleting device group... ",
-      "applySuccess": "Device group deleted successfully!",
-      "close": "Close"
-    },
-    "format": {
-      "add": "Add",
-      "keyHeader": "Key",
-      "displayNameHeader": "Display Name",
-      "telemetryFormatHeader": "Telemetry Format",
-      "validation": {
-        "required": "Required fields are not included"
-      }
-    }
-  },
     "dashboard": {
         "noData": "No data available",
         "panels": {
@@ -259,7 +314,9 @@
                 "notConnected": "Offline"
             },
             "telemetry": {
-                "header": "Telemetry"
+                "header": "Telemetry",
+                "timezoneDisplay": "Displaying in local timezone:",
+                "limitExceededWarning": "Maximum number of messages received. Earlier data may be truncated."
             }
         }
     },
@@ -297,11 +354,11 @@
                     "hint": "Select user role",
                     "label": "User Role"
                 },
-                "systemAdmin":{
-                    "hint":"Select user",
-                    "label":"System Admin",
-                    "title":"Add System Admin",
-                    "add":"Add",
+                "systemAdmin": {
+                    "hint": "Select user",
+                    "label": "System Admin",
+                    "title": "Add System Admin",
+                    "add": "Add",
                     "applySuccess": "Added system admin successfully!"
                 },
                 "apply": "Send invite",
@@ -327,12 +384,12 @@
                 "apply": "Delete",
                 "pending": "Deleting users... ",
                 "applySuccess": "Users deleted successfully!",
-                "close": "Close",                
-                "systemAdmin":{
-                    "hint":"Select user",
-                    "label":"System Admin",
-                    "title":"Delete System Admin",
-                    "add":"Delete",
+                "close": "Close",
+                "systemAdmin": {
+                    "hint": "Select user",
+                    "label": "System Admin",
+                    "title": "Delete System Admin",
+                    "add": "Delete",
                     "applySuccess": "Deleted system admin successfully!"
                 }
             }
@@ -405,6 +462,15 @@
                 },
                 "telemetry": {
                     "title": "Telemetry"
+                },
+                "deviceUploads": {
+                    "title": "Device Uploads",
+                    "description": "File Uploads from Device",
+                    "noneExist": "No Files are uploaded from Device.",
+                    "fileName": "File Name",
+                    "action": "Action",
+                    "property": "Property",
+                    "value": "Value"
                 }
             },
             "delete": {
@@ -579,6 +645,8 @@
         "title": "Rules",
         "searchPlaceholder": "Search rules...",
         "ariaLabel": "Search rules",
+        "alertingOnForRules": "Alerting must be turned on to use Rules",
+        "turnOnRulesText": "You may turn this feature on by clicking the settings menu (gear icon) at the top right of the  screen",
         "severity": {
             "info": "Info",
             "warning": "Warning",
@@ -819,6 +887,20 @@
                     "positiveInteger": "Must be a positive integer less than 2147483648",
                     "name": "name greater than 50 characters"
                 }
+            },
+            "status":{
+                "title": "Deployment Status",
+                "relatedDeployment": {
+                    "title": "Related Deployments",
+                    "noRelatedDeploymentText":"No Related deployments exist for the selected deployment."
+                },
+                "deploymentLimitText": "Your environment is currently limited to 100 active deployments.",
+                "active": "Active",
+                "inActive": "InActive",
+                "apply": "Apply",
+                "cancel": "Cancel",
+                "close": "Close",
+                "updating": "Updating Deployment"
             }
         },
         "details": {
@@ -866,7 +948,11 @@
             "appliedTooltip": "Number of device twins that have been modified by the configuration.",
             "failed": "Failed",
             "succeeded": "Succeeded",
-            "dateCreated": "Created On"
+            "createdOn": "Created On",
+            "status": "Status",
+            "modifiedBy": "Modified By",
+            "modifiedOn": "Modified On",
+            "createdBy": "Created By"
         }
     },
     "packages": {
@@ -905,6 +991,8 @@
                 "browse": "Browse",
                 "browseFirmwareText": "for a firmware file",
                 "browseText": "for a package file",
+                "firmwareTemplateTip": "Initial JSON data is derived from your template. You can view and edit this template from the Settings menu.",
+                "firmwareJson": "Firmware JSON",
                 "packageNamePlaceholder": "Enter Package Name",
                 "packageVersionPlaceholder": "Enter Package Version",
                 "packageTypePlaceholder": "Select package type",
@@ -925,8 +1013,8 @@
                     "unsupportedVersionKey": "Unsupported version key in desired properties"
                 }
             },
-            "packageJson":{
-                "title":"Package JSON Data"
+            "packageJson": {
+                "title": "Package JSON Data"
             }
         },
         "modals": {

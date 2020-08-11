@@ -8,6 +8,13 @@ resources:
       type: githubenterprise
       name: MMM/azure-iot-services-dotnet
       endpoint: GithubMMM
+schedules:
+  - cron: 0 6 * * *
+    displayName: Daily midnight (CST) build
+    branches:
+      include:
+        - master
+    always: true
 stages:
   - stage: crslDev
     dependsOn: []
@@ -18,7 +25,7 @@ stages:
         steps:
           - template: ../templates/steps-report-versions.yaml
             parameters:
-              kubernetesVersion: 1.17.5
+              kubernetesVersion: 1.18.2
               azureServiceConnectionName: 3M-CRSLAD16-BBIoTP-Dev
               serenityEnvironment: crslDev
 
@@ -31,7 +38,7 @@ stages:
         steps:
           - template: ../templates/steps-report-versions.yaml
             parameters:
-              kubernetesVersion: 1.17.5
+              kubernetesVersion: 1.18.1
               azureServiceConnectionName: 3M-CRSLAD16-BBIoTP-Dev
               serenityEnvironment: ggkDev
 
@@ -44,7 +51,7 @@ stages:
         steps:
           - template: ../templates/steps-report-versions.yaml
             parameters:
-              kubernetesVersion: 1.16.8
+              kubernetesVersion: 1.18.1
               azureServiceConnectionName: 3M-CRSLAD17-BBIoTP-QA
               serenityEnvironment: crslQa
 
@@ -57,7 +64,7 @@ stages:
         steps:
           - template: ../templates/steps-report-versions.yaml
             parameters:
-              kubernetesVersion: 1.16.8
+              kubernetesVersion: 1.18.1
               azureServiceConnectionName: 3M-CRSLAD19-BBIoTP-Prod
               serenityEnvironment: crslWkbnch
 
@@ -123,8 +130,21 @@ stages:
           - template: ../templates/steps-report-versions.yaml
             parameters:
               kubernetesVersion: 1.16.8
-              azureServiceConnectionName: 3M-ASDT05-PSD-CS-IOT-QA
+              azureServiceConnectionName: 3M-ASDT07-PSD-CS-IOT-Prod
               serenityEnvironment: psdEu
+
+  - stage: psdQa
+    dependsOn: []
+    displayName: PSD QA
+    jobs:
+      - job: psdQa
+        displayName: PSD QA
+        steps:
+          - template: ../templates/steps-report-versions.yaml
+            parameters:
+              kubernetesVersion: 1.16.8
+              azureServiceConnectionName: 3M-ASDT05-PSD-CS-IOT-QA
+              serenityEnvironment: psdQa
 
   - stage: psdStg
     dependsOn: []
@@ -138,6 +158,19 @@ stages:
               kubernetesVersion: 1.16.8
               azureServiceConnectionName: 3M-ASDT05-PSD-CS-IOT-QA
               serenityEnvironment: psdStg
+
+  - stage: psdProd
+    dependsOn: []
+    displayName: PSD Prod
+    jobs:
+      - job: psdProd
+        displayName: PSD Prod
+        steps:
+          - template: ../templates/steps-report-versions.yaml
+            parameters:
+              kubernetesVersion: 1.16.8
+              azureServiceConnectionName: 3M-ASDT07-PSD-CS-IOT-Prod
+              serenityEnvironment: psdProd
 
   - stage: emdDev
     dependsOn: []

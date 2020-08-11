@@ -9,6 +9,42 @@ To easily get a list of committed changes between current master and the previou
 git log --oneline --no-decorate --topo-order ^<previousRelease> master
 where <previousRelease> is the release name e.g 5.1.0
 -->
+## [5.2.2] - 2020-07-26
+### Fixed
+- Added and updated translations for phrases for German, English, French, Spanish, Hindi, Tamil, and Vietnamese
+- Pinned device groups are now properly saved
+- Active device group now switches on new session
+- Fixed issues with alerts being disabled for rules affecting device groups with numeric conditions
+- Re-enable cross-partition queries for alarms
+- Location for DPS now uses configuration value instead of hard-coded "eastus"
+
+## [5.2.1] - 2020-07-15
+### Fixed
+- Corrected the application version number
+
+## [5.2.0] - 2020-07-15
+### Added
+- Show application version number in settings flyout with link to changelog for release notes
+- Updated the display of device names in telemetry chart
+- Device group sorting
+- Package firmware JSON template is now fully customizable with a configurable default
+- Access device file uploads in device details flyout
+- Allow the creation of supported methods per device group
+- Timeframe for telemetry chart in device details flyout is now configurable
+- Telemetry chart displays explanation when incomplete dataset is shown due to message count limits
+- Enable configuration of device telemetry message retrieval count limit
+
+### Fixed
+- Re-enable cross-partition queries for device telemetry messages
+- Clarified language in system settings privacy notice
+- Telemetry chart attributes no longer show unnecessary left-right scroll buttons
+- Enabling advanced alerting in the settings panel no longer shows as failed
+- Default logo now appears with correct size
+- Prevent stack trace from appearing in error message when API returns HTTP 500
+- Now default to read batched data timestamp in seconds in ASA
+- Sign-in to Outlook is no longer required for enabling emails on rules
+- Prevent occasional blank screen in Edge browser
+- Custom role names now appear correctly in User Profile flyout and elsewhere
 
 ## [5.1.0] - 2020-06-12
 ### Added
@@ -38,6 +74,9 @@ where <previousRelease> is the release name e.g 5.1.0
 - Application configuration uses Azure App Configuration service in addition to Azure Key Vault
 - Code base rearchitected to use common library and reduce duplication
 
-[5.1.0]: https://github.com/3mcloud/azure-iot-platform-dotnet/releases/tag/5.1.0%2B7c220f1fbb11917602c14497d5410b242c0ed11a.63385
+[5.2.2]: https://github.com/3mcloud/azure-iot-platform-dotnet/releases/tag/5.2.2
+[5.2.1]: https://github.com/3mcloud/azure-iot-platform-dotnet/releases/tag/5.2.1
+[5.2.0]: https://github.com/3mcloud/azure-iot-platform-dotnet/releases/tag/5.2.0
+[5.1.0]: https://github.com/3mcloud/azure-iot-platform-dotnet/releases/tag/5.1.0
 [5.0.1]: https://github.com/3mcloud/azure-iot-platform-dotnet/releases/tag/5.0.1
 [5.0.0]: https://github.com/3mcloud/azure-iot-platform-dotnet/releases/tag/5.0.0

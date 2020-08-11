@@ -166,6 +166,7 @@ export class TelemetryChart extends Component {
             );
         }
         const noAnimate = telemetryKey === this.state.telemetryKey; // will be false if there is no telemetry data
+        const isCompactMode = chartData.length <= 5;
         // Set a timeout to allow the panel height to be calculated before updating the graph
         setTimeout(() => {
             if (
@@ -183,8 +184,9 @@ export class TelemetryChart extends Component {
                         includeDots: true,
                         yAxisState: "shared", // Default to all values being on the same axis
                         grid: false,
-                        legend: "compact",
+                        legend: isCompactMode ? "compact" : "shown",
                         offset: timezone,
+                        tooltip: true,
                     },
                     this.props.colors
                 );
@@ -200,7 +202,7 @@ export class TelemetryChart extends Component {
     };
 
     render() {
-        const { telemetry } = this.props,
+        const { telemetry, limitExceeded, t } = this.props,
             { telemetryKeys } = this.state,
             telemetryList = telemetryKeys.map((key) => {
                 const count = Object.keys(telemetry[key]).length,
@@ -224,7 +226,14 @@ export class TelemetryChart extends Component {
                     active={this.state.telemetryKey}
                 />
                 <div className="chart-container" id={this.chartId} />
-                <p>Displaying in local timezone: {timezone}</p>
+                <p>{`${t(
+                    "dashboard.panels.telemetry.timezoneDisplay"
+                )} ${timezone}`}</p>
+                {limitExceeded && (
+                    <p>
+                        {t("dashboard.panels.telemetry.limitExceededWarning")}
+                    </p>
+                )}
             </div>
         );
     }
