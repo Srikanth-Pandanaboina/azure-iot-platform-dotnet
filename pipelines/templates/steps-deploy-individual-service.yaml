@@ -39,19 +39,20 @@ steps:
       arguments: --force-upgrade
 
 
-  - task: HelmDeploy@0
-    displayName: Creation Of Service for first time
-    inputs:
-      connectionType: Azure Resource Manager
-      azureSubscription: 3M-CRSLAD16-BBIoTP-Dev
-      azureResourceGroup: rg-iot-ggk-dev
-      kubernetesCluster: ggktech-aks-dev
-      namespace: default
-      command: install
-      chartType: FilePath
-      chartPath: charts/mmm-iot-service
-      releaseName: ${{parameters.serviceName}}
-      overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=blue,deployment.enabled=false,service.enabled=true
+  # - task: HelmDeploy@0
+  #   displayName: Creation Of Service for first time
+  #   inputs:
+  #     connectionType: Azure Resource Manager
+  #     azureSubscription: 3M-CRSLAD16-BBIoTP-Dev
+  #     azureResourceGroup: rg-iot-ggk-dev
+  #     kubernetesCluster: ggktech-aks-dev
+  #     namespace: default
+  #     command: install
+  #     chartType: FilePath
+  #     chartPath: charts/mmm-iot-service
+  #     releaseName: ${{parameters.serviceName}}
+  #     overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=blue,deployment.enabled=false,service.enabled=true
+
   - task: HelmDeploy@0
     displayName: Creation Blue application deployment
     inputs:
