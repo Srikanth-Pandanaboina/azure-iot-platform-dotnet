@@ -65,7 +65,7 @@ steps:
       azureResourceGroup: rg-iot-ggk-dev
       kubernetesCluster: ggktech-aks-dev
       namespace: default
-      command: install
+      command: upgrade
       chartType: FilePath
       chartPath: charts/mmm-iot-service
       releaseName: ${{parameters.blueServiceName}}
@@ -79,7 +79,7 @@ steps:
       azureResourceGroup: rg-iot-ggk-dev
       kubernetesCluster: ggktech-aks-dev
       namespace: default
-      command: install
+      command: upgrade
       chartType: FilePath
       chartPath: charts/mmm-iot-service
       releaseName: ${{parameters.greenServiceName}}
