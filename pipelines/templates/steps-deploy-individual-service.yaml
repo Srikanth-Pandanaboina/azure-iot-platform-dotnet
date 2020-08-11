@@ -69,9 +69,8 @@ steps:
       chartType: FilePath
       chartPath: charts/mmm-iot-service
       releaseName: ${{parameters.blueServiceName}}
-      install: true
       overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},deployment.image.tag=${{parameters.imageTag}},type=blue,deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.blueServiceName}}
-
+      install: true
   - task: HelmDeploy@0
     displayName: Creation of Green Deployment
     inputs:
