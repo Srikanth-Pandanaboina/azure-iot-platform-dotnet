@@ -3,12 +3,13 @@ parameters:
   resourceGroupName:
   subscriptionName:
   serviceName:
+  blueServiceName: 
+  greenServiceName: 
   servicePort:
   serviceProbesEnabled:
   helmVersion:
   imageTag:
-  blueServiceName: 
-  greenServiceName: 
+
 
 steps:
   - script: |-
