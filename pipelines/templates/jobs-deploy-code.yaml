@@ -89,6 +89,8 @@ jobs:
           resourceGroupName: $(resourceGroupName)
           subscriptionName: ${{parameters.subscriptionName}}
           serviceName: $(serviceName)
+          blueServiceName: $(serviceName)-blue
+          greenServiceName: $(serviceName)-green
           servicePort: $(servicePort)
           serviceProbesEnabled: $(serviceProbesEnabled)
           helmVersion: $(helmVersion)
