@@ -7,13 +7,9 @@ parameters:
   serviceProbesEnabled:
   helmVersion:
   imageTag:
+  blueServiceName: ${{parameters.serviceName}}-blue
+  greenServiceName: ${{parameters.serviceName}}-green
 
-variables:
-  - template: variables-all.yaml
-  - name: blueServiceName
-    value: ${{parameters.serviceName}}-blue
-  - name: greenServiceName
-    value: ${{parameters.serviceName}}-Green
 steps:
   - script: |-
       echo "aksName: ${{parameters.aksName}}"
