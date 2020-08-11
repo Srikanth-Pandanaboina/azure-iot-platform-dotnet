@@ -20,7 +20,7 @@ steps:
       echo "servicePort: ${{parameters.servicePort}}"
       echo "serviceProbesEnabled: ${{parameters.serviceProbesEnabled}}"
       echo "helmVersion: ${{parameters.helmVersion}}"
-      echo "ServiceName: ${{blueServiceName}}"
+      echo "blueServiceName: ${{parameters.blueServiceName}}"
     displayName: Print step variables
 
   - checkout: self
@@ -68,7 +68,7 @@ steps:
       command: install
       chartType: FilePath
       chartPath: charts/mmm-iot-service
-      releaseName: ${{blueServiceName}}
+      releaseName: ${{parameters.blueServiceName}}
       overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},deployment.image.tag=${{parameters.imageTag}},type=blue,deployment.enabled=true,service.enabled=false,deployment.name=${{blueServiceName}}
 
   - task: HelmDeploy@0
@@ -82,8 +82,8 @@ steps:
       command: install
       chartType: FilePath
       chartPath: charts/mmm-iot-service
-      releaseName: ${{parameters.serviceName}}-Green
-      overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},type=green,deployment.image.tag=${{parameters.imageTag}},deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.serviceName}}+'Green'
+      releaseName: ${{parameters.greenServiceName}}
+      overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},type=green,deployment.image.tag=${{parameters.imageTag}},deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.${{parameters.blueServiceName}}
     
       
   - task: HelmDeploy@0
