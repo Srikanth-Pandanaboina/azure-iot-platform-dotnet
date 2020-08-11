@@ -375,7 +375,7 @@ namespace Mmm.Iot.IoTHubManager.Services.Test
             this.storageAdapterClient.Setup(r => r.GetAllAsync(It.IsAny<string>())).ReturnsAsync(new ValueListApiModel() { Items = storageData });
 
             // Act
-            var returnedDeployments = await this.deployments.ListAllAsync();
+            var returnedDeployments = await this.deployments.ListFromStorageAsync();
 
             // Assert
             Assert.Equal(numDeployments, returnedDeployments.Items.Count);
