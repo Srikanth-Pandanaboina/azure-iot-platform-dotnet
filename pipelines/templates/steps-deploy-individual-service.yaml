@@ -9,6 +9,7 @@ parameters:
   imageTag:
 
 variables:
+  - template: variables-all.yaml
   - name: blueServiceName
     value: ${{parameters.serviceName}}-blue
   - name: greenServiceName
