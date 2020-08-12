@@ -43,6 +43,7 @@ steps:
           echo "##vso[task.setvariable variable=blue;isOutput=true]$type"
         else
           echo "##vso[task.setvariable variable=green;isOutput=true]$type"
+        fi
 
   - task: HelmInstaller@1
     displayName: Install Helm
