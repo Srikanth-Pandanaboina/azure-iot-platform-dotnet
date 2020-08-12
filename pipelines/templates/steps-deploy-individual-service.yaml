@@ -25,6 +25,18 @@ steps:
 
   - checkout: self
     displayName: Checkout repository
+         
+  # - task: AzureCLI@2
+  #   displayName: Connect to AKS Cluster
+  #   name: getPipelineVariables
+  #   inputs:
+  #     azureSubscription: ${{parameters.subscriptionName}}
+  #     scriptType: bash
+  #     scriptLocation: inlineScript
+  #     inlineScript: |-
+  #       set -Eeuxo pipefail
+  #       az aks get-credentials --name ${{parameters.aksName}} --resource-group ${{parameters.resourceGroupName}} --overwrite-existing
+  #       kubectl get pods
 
   - task: HelmInstaller@1
     displayName: Install Helm
@@ -43,19 +55,19 @@ steps:
       arguments: --force-upgrade
 
 
-  # - task: HelmDeploy@0
-  #   displayName: Creation Of Service for first time
-  #   inputs:
-  #     connectionType: Azure Resource Manager
-  #     azureSubscription: 3M-CRSLAD16-BBIoTP-Dev
-  #     azureResourceGroup: rg-iot-ggk-dev
-  #     kubernetesCluster: ggktech-aks-dev
-  #     namespace: default
-  #     command: install
-  #     chartType: FilePath
-  #     chartPath: charts/mmm-iot-service
-  #     releaseName: ${{parameters.serviceName}}
-  #     overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=blue,deployment.enabled=false,service.enabled=true
+  - task: HelmDeploy@0
+    displayName: Creation Of Service for first time
+    inputs:
+      connectionType: Azure Resource Manager
+      azureSubscription: 3M-CRSLAD16-BBIoTP-Dev
+      azureResourceGroup: rg-iot-ggk-dev
+      kubernetesCluster: ggktech-aks-dev
+      namespace: default
+      command: upgrade
+      chartType: FilePath
+      chartPath: charts/mmm-iot-service
+      releaseName: ${{parameters.serviceName}}
+      overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=blue,deployment.enabled=false,service.enabled=true
 
   - task: HelmDeploy@0
     displayName: Creation Blue application deployment
