@@ -117,21 +117,33 @@ steps:
   - bash: |
       echo "${{ parameters.type }}"
       echo "$(type)"
-  - task: HelmDeploy@0
+  # - task: HelmDeploy@0
+  #   inputs:
+  #     connectionType: Azure Resource Manager
+  #     azureSubscription: ${{parameters.subscriptionName}}
+  #     azureResourceGroup: ${{parameters.resourceGroupName}}
+  #     kubernetesCluster: ${{parameters.aksName}}
+  #     useClusterAdmin: false
+  #     namespace: default
+  #     command: upgrade
+  #     type: $(type)
+  #     chartType: FilePath
+  #     chartPath: charts/mmm-iot-service
+  #     releaseName: ${{parameters.serviceName}}
+  #     overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=${{ parameters.type }},deployment.enabled=false,service.enabled=true
+  #     force: true
+  #     arguments: --cleanup-on-fail --set-string gitSha=$(Build.SourceVersion)
+  #     waitForExecution: true
+  #     install: true
+  - task: AzureCLI@2
+    displayName: Patch the AKS Service
+    name: getPipelineVariables
     inputs:
-      connectionType: Azure Resource Manager
       azureSubscription: ${{parameters.subscriptionName}}
-      azureResourceGroup: ${{parameters.resourceGroupName}}
-      kubernetesCluster: ${{parameters.aksName}}
-      useClusterAdmin: false
-      namespace: default
-      command: upgrade
-      type: $(type)
-      chartType: FilePath
-      chartPath: charts/mmm-iot-service
-      releaseName: ${{parameters.serviceName}}
-      overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=${{ parameters.type }},deployment.enabled=false,service.enabled=true
-      force: true
-      arguments: --cleanup-on-fail --set-string gitSha=$(Build.SourceVersion)
-      waitForExecution: true
-      install: true
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |-
+        set -Eeuxo pipefail
+        az aks get-credentials --name ${{parameters.aksName}} --resource-group ${{parameters.resourceGroupName}} --overwrite-existing
+        kubectl get pods 
+        kubectl patch svc ${{parameters.serviceName}} -p '{"spec": {"selector": {"app.kubernetes.io/name":"${{parameters.serviceName}}", "type": "${{parameters.type}}"}}}'
