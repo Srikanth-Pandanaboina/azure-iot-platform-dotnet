@@ -81,8 +81,12 @@ steps:
       install: true
       overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=blue,deployment.enabled=false,service.enabled=true
 
+  - bash: |
+      echo "$(type)"
+
   - task: HelmDeploy@0
     displayName: Creation Blue application deployment
+    condition: eq($(type),'blue')
     inputs:
       connectionType: Azure Resource Manager
       azureSubscription: 3M-CRSLAD16-BBIoTP-Dev
@@ -96,10 +100,13 @@ steps:
       overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},deployment.image.tag=${{parameters.imageTag}},type=blue,deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.blueServiceName}}
       force: true
       install: true
-      condition: eq($(type),'blue')
+#      condition: eq($(type),'blue')
+  - bash: |
+      echo "$(type)"
 
   - task: HelmDeploy@0
     displayName: Creation of Green Deployment
+    condition: eq($(type),'green')
     inputs:
       connectionType: Azure Resource Manager
       azureSubscription: 3M-CRSLAD16-BBIoTP-Dev
@@ -113,9 +120,7 @@ steps:
       overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},type=green,deployment.image.tag=${{parameters.imageTag}},deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.greenServiceName}}
       force: true
       install: true
-      condition: eq($(type),'green')
   - bash: |
-      echo "${{ parameters.type }}"
       echo "$(type)"
   # - task: HelmDeploy@0
   #   inputs:
