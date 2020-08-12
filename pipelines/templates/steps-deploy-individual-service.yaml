@@ -87,6 +87,7 @@ steps:
       azureSubscription: 3M-CRSLAD16-BBIoTP-Dev
       azureResourceGroup: rg-iot-ggk-dev
       kubernetesCluster: ggktech-aks-dev
+      type: $(type)
       namespace: default
       command: upgrade
       chartType: FilePath
@@ -105,6 +106,7 @@ steps:
       azureResourceGroup: rg-iot-ggk-dev
       kubernetesCluster: ggktech-aks-dev
       namespace: default
+      type: $(type)
       command: upgrade
       chartType: FilePath
       chartPath: charts/mmm-iot-service
@@ -123,6 +125,7 @@ steps:
       useClusterAdmin: false
       namespace: default
       command: upgrade
+      type: $(type)
       chartType: FilePath
       chartPath: charts/mmm-iot-service
       releaseName: ${{parameters.serviceName}}
