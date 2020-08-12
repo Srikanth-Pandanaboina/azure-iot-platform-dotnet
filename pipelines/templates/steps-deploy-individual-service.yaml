@@ -26,27 +26,26 @@ steps:
   - checkout: self
     displayName: Checkout repository
          
-{{- /*
-   - task: AzureCLI@2
-    displayName: Connect to AKS Cluster
-    name: getPipelineVariables
-    inputs:
-      azureSubscription: ${{parameters.subscriptionName}}
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |-
-        set -Eeuxo pipefail
-        az aks get-credentials --name ${{parameters.aksName}} --resource-group ${{parameters.resourceGroupName}} --overwrite-existing
-        kubectl get pods
-        type=`kubectl get svc webui -o=jsonpath='{.spec.selector.type}'`
-        echo "$type"
-        if($type == "green")
-        then
-          echo "##vso[task.setvariable variable=blue;isOutput=true]$type"
-        else
-          echo "##vso[task.setvariable variable=green;isOutput=true]$type"
-        fi 
-*/ -}}
+  # - task: AzureCLI@2
+  #   displayName: Connect to AKS Cluster
+  #   name: getPipelineVariables
+  #   inputs:
+  #     azureSubscription: ${{parameters.subscriptionName}}
+  #     scriptType: bash
+  #     scriptLocation: inlineScript
+  #     inlineScript: |-
+  #       set -Eeuxo pipefail
+  #       az aks get-credentials --name ${{parameters.aksName}} --resource-group ${{parameters.resourceGroupName}} --overwrite-existing
+  #       kubectl get pods
+  #       type=`kubectl get svc webui -o=jsonpath='{.spec.selector.type}'`
+  #       echo "$type"
+  #       if($type == "green")
+  #       then
+  #         echo "##vso[task.setvariable variable=blue;isOutput=true]$type"
+  #       else
+  #         echo "##vso[task.setvariable variable=green;isOutput=true]$type"
+  #       fi 
+
 
   - task: HelmInstaller@1
     displayName: Install Helm
