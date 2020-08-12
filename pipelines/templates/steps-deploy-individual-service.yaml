@@ -137,7 +137,7 @@ steps:
   #     install: true
   - task: AzureCLI@2
     displayName: Patch the AKS Service
-    name: getPipelineVariables
+    name: patchAKSService
     inputs:
       azureSubscription: ${{parameters.subscriptionName}}
       scriptType: bash
