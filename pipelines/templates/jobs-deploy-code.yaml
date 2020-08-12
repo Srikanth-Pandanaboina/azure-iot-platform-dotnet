@@ -95,3 +95,4 @@ jobs:
           serviceProbesEnabled: $(serviceProbesEnabled)
           helmVersion: $(helmVersion)
           imageTag: ${{parameters.imageTag}}
+          type: 'blue'

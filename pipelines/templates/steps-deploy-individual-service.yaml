@@ -92,7 +92,7 @@ steps:
       overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},deployment.image.tag=${{parameters.imageTag}},type=blue,deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.blueServiceName}}
       force: true
       install: true
-      condition: and(succeeded(), eq (variable.type,'blue'))
+      condition: and(succeeded(), eq ($(type),'blue'))
 
   - task: HelmDeploy@0
     displayName: Creation of Green Deployment
@@ -109,7 +109,7 @@ steps:
       overrideValues: nameOverride=${{parameters.serviceName}},deployment.port.http=${{parameters.servicePort}},deployment.probes.enabled=${{parameters.serviceProbesEnabled}},type=green,deployment.image.tag=${{parameters.imageTag}},deployment.enabled=true,service.enabled=false,deployment.name=${{parameters.greenServiceName}}
       force: true
       install: true
-      condition: and(succeeded(), eq (variable.type,'green'))
+      condition: and(succeeded(), eq ($(type),'green'))
       
   - task: HelmDeploy@0
     inputs:
@@ -123,7 +123,7 @@ steps:
       chartType: FilePath
       chartPath: charts/mmm-iot-service
       releaseName: ${{parameters.serviceName}}
-      overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=$type,deployment.enabled=false,service.enabled=true
+      overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=$(type),deployment.enabled=false,service.enabled=true
       force: true
       arguments: --cleanup-on-fail --set-string gitSha=$(Build.SourceVersion)
       waitForExecution: true
