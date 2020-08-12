@@ -39,7 +39,7 @@ steps:
         kubectl get pods
         type=`kubectl get svc webui -o=jsonpath='{.spec.selector.type}'`
         echo "$type"
-        if[ $type == "green"]; then
+        if($type == "green")
           echo "##vso[task.setvariable variable=blue;isOutput=true]$type"
         else
           echo "##vso[task.setvariable variable=green;isOutput=true]$type"
