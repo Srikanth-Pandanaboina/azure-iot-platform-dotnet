@@ -9,6 +9,7 @@ parameters:
   serviceProbesEnabled:
   helmVersion:
   imageTag:
+  type:
 
 
 steps:
@@ -116,7 +117,8 @@ steps:
       install: true
       condition: and(succeeded(), eq ($(type),'green'))
   - bash: |
-      echo "${{ type }}"
+      echo "$type"
+      echo "$(type)"
   - task: HelmDeploy@0
     inputs:
       connectionType: Azure Resource Manager
