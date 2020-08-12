@@ -26,7 +26,8 @@ steps:
   - checkout: self
     displayName: Checkout repository
          
-  - task: AzureCLI@2
+{{- /*
+   - task: AzureCLI@2
     displayName: Connect to AKS Cluster
     name: getPipelineVariables
     inputs:
@@ -44,7 +45,8 @@ steps:
           echo "##vso[task.setvariable variable=blue;isOutput=true]$type"
         else
           echo "##vso[task.setvariable variable=green;isOutput=true]$type"
-        fi
+        fi 
+*/ -}}
 
   - task: HelmInstaller@1
     displayName: Install Helm
@@ -75,6 +77,7 @@ steps:
       chartType: FilePath
       chartPath: charts/mmm-iot-service
       releaseName: ${{parameters.serviceName}}
+      install: true
       overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=blue,deployment.enabled=false,service.enabled=true
 
   - task: HelmDeploy@0
@@ -110,7 +113,7 @@ steps:
       force: true
       install: true
       condition: and(succeeded(), eq ($(type),'green'))
-      
+
   - task: HelmDeploy@0
     inputs:
       connectionType: Azure Resource Manager
