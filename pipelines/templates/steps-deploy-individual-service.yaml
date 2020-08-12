@@ -76,6 +76,7 @@ steps:
       chartType: FilePath
       chartPath: charts/mmm-iot-service
       releaseName: ${{parameters.serviceName}}
+      force: true
       install: true
       overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=blue,deployment.enabled=false,service.enabled=true
 
