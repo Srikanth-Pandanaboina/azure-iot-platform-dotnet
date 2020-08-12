@@ -82,11 +82,12 @@ steps:
       overrideValues: nameOverride=${{parameters.serviceName}},service.port=${{parameters.servicePort}},type=blue,deployment.enabled=false,service.enabled=true
 
   - bash: |
+      echo "$(variable.type)"
       echo "$(type)"
 
   - task: HelmDeploy@0
     displayName: Creation Blue application deployment
-    condition: eq($(type),'blue')
+    condition: eq(variable.type,'blue')
     inputs:
       connectionType: Azure Resource Manager
       azureSubscription: 3M-CRSLAD16-BBIoTP-Dev
@@ -106,7 +107,7 @@ steps:
 
   - task: HelmDeploy@0
     displayName: Creation of Green Deployment
-    condition: eq($(type),'green')
+    condition: eq(variable.type,'green')
     inputs:
       connectionType: Azure Resource Manager
       azureSubscription: 3M-CRSLAD16-BBIoTP-Dev
