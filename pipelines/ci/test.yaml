@@ -133,7 +133,58 @@ stages:
                 az storage entity insert --entity PartitionKey=$(tableStoragePartition) RowKey=$(tableStorageRowKeyPrefix)$(tableStorageAppConfigurationConnectionStringRowKey) Content="$appConfigurationConnectionString" --table-name $(tableStorageName) --account-name $(storageAccountName)
 
       - job: build
-        displayName: Build
+        displayName: Build Linux
+        dependsOn:
+          - preBuild
+        variables:
+          AppConfigurationConnectionString: $[dependencies.preBuild.outputs['getAppConfigurationConnectionString.appConfigurationConnectionString']]
+        steps:
+          - checkout: self
+            displayName: Checkout repository
+
+          - script: >-
+              dotnet restore
+              --force
+              --no-cache
+              --no-dependencies
+              --packages .nuget
+              --runtime $(dotnetProductionRuntimeId)
+              /p:TargetLatestRuntimePatch=true
+            displayName: Restore dependencies
+
+          - script: >-
+              dotnet publish
+              --self-contained false
+              --no-restore
+              --no-dependencies
+              --configuration $(dotnetBuildConfiguration)
+              --runtime $(dotnetProductionRuntimeId)
+              /p:TargetLatestRuntimePatch=true
+            displayName: Build assemblies
+
+          - task: CopyFiles@2
+            displayName: Prepare services artifacts
+            inputs:
+              contents: |
+                *.sln
+                *.props
+                *.ruleset
+                global.json
+                .nuget/**/*
+                src/services/**/*
+                test/services/**/*
+                src/functions/**/*
+              targetFolder: $(publishedFilesArtifactName)
+              cleanTargetFolder: true
+
+          - publish: $(publishedFilesArtifactName)
+            artifact: $(publishedFilesArtifactName)
+            displayName: Publish services artifacts
+
+      - job: build
+        displayName: Build Windows
+        pool:
+            vmImage: 'vs2017-win2016'
         dependsOn:
           - preBuild
         variables:
@@ -169,25 +220,6 @@ stages:
                 src/functions/**/*
               targetFolder: $(functionsArtifactName)
               cleanTargetFolder: true
-
-          - task: CopyFiles@2
-            displayName: Prepare services artifacts
-            inputs:
-              contents: |
-                *.sln
-                *.props
-                *.ruleset
-                global.json
-                .nuget/**/*
-                src/services/**/*
-                test/services/**/*
-                src/functions/**/*
-              targetFolder: $(publishedFilesArtifactName)
-              cleanTargetFolder: true
-
-          - publish: $(publishedFilesArtifactName)
-            artifact: $(publishedFilesArtifactName)
-            displayName: Publish services artifacts
 
           - publish: $(functionsArtifactName)
             artifact: $(functionsArtifactName)

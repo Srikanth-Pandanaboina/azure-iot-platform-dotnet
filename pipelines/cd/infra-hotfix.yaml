@@ -111,7 +111,6 @@ stages:
                 echo "A value for the 'testPipelineRunId' variable must be provided" > /dev/stderr
                 exit 1
               fi
-        displayName: Check parameters
 
   - template: ../templates/jobs-deploy-infra.yaml
     parameters:
