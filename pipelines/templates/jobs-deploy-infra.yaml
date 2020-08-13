@@ -737,42 +737,33 @@ jobs:
           inlineScript: |-
             az keyvault secret set --vault-name $(keyVaultName) --name 'Global--ServicePrincipalId' --value $servicePrincipalId
             az keyvault secret set --vault-name $(keyVaultName) --name 'Global--ServicePrincipalKey' --value $servicePrincipalKey
-
             blobStorageKey=$(az storage account keys list -g $(resourceGroupName) -n $(storageAccountName) --query "[?contains(keyName, 'key1')]".value --output tsv)
             blobStorageConnString="DefaultEndpointsProtocol=https;AccountName=$(storageAccountName);AccountKey=$blobStorageKey;EndpointSuffix=core.windows.net"
             az keyvault secret set --vault-name $(keyVaultName) --name 'Global--StorageAccountConnectionString' --value $blobStorageConnString
-
             cosmosDBUri=$(az cosmosdb show -g $(resourceGroupName) -n $(cosmosDbAccountName) | jq -r ".documentEndpoint")
             cosmosDBAuthKey=$(az cosmosdb keys list --resource-group $(resourceGroupName) --name $(cosmosDbAccountName) --query primaryMasterKey --output tsv)
             cosmosDBConnection="AccountEndpoint=$cosmosDBUri;AccountKey=$cosmosDBAuthKey;"
             az keyvault secret set --vault-name $(keyVaultName) --name 'Global--CosmosDb--DocumentDbEndpoint' --value $cosmosDBUri
             az keyvault secret set --vault-name $(keyVaultName) --name 'Global--CosmosDb--DocumentDbAuthKey' --value $cosmosDBAuthKey
             az keyvault secret set --vault-name $(keyVaultName) --name 'Global--CosmosDb--DocumentDbConnectionString' --value $cosmosDBConnection
-
             evAccessPolicyKey=$(az eventhubs namespace authorization-rule keys list -n $(defaultSasKeyName) -g $(resourceGroupName) --namespace-name $(eventHubName) --query primaryKey -o tsv)
             az keyvault secret set --vault-name $(keyVaultName) --name 'TenantManagerService--EventHubAccessPolicyKey' --value $evAccessPolicyKey
-
             ehQueueAuthRule='iothubroutes'
             lifecycleEv=$(az eventhubs eventhub list --resource-group $(resourceGroupName) --namespace-name $(eventHubName) --query "[?contains(name, 'lifecycle')]".name --output tsv)
             lifecycleEvConn=$(az eventhubs eventhub authorization-rule keys list --resource-group $(resourceGroupName) --namespace-name $(eventHubName) --eventhub-name $lifecycleEv --name $ehQueueAuthRule --query primaryConnectionString --output tsv)
             az keyvault secret set --vault-name $(keyVaultName) --name 'TenantManagerService--LifecycleEventHubConnectionString' --value $lifecycleEvConn
-
             telemetryEv=$(az eventhubs eventhub list --resource-group $(resourceGroupName) --namespace-name $(eventHubName) --query "[?contains(name, 'telemetry')]".name --output tsv)
             telemetryEvConn=$(az eventhubs eventhub authorization-rule keys list --resource-group $(resourceGroupName) --namespace-name $(eventHubName) --eventhub-name $telemetryEv --name $ehQueueAuthRule --query primaryConnectionString --output tsv)
             az keyvault secret set --vault-name $(keyVaultName) --name 'TenantManagerService--TelemetryEventHubConnectionString' --value $telemetryEvConn
-
             twinchangeEv=$(az eventhubs eventhub list --resource-group $(resourceGroupName) --namespace-name $(eventHubName) --query "[?contains(name, 'twin-change')]".name --output tsv)
             twinchangeEvConn=$(az eventhubs eventhub authorization-rule keys list --resource-group $(resourceGroupName) --namespace-name $(eventHubName) --eventhub-name $twinchangeEv --name $ehQueueAuthRule --query primaryConnectionString --output tsv)
             az keyvault secret set --vault-name $(keyVaultName) --name 'TenantManagerService--TwinChangeEventHubConnectionString' --value $twinchangeEvConn
-
             ehActionsAuthRule='actionroutes'
             actionsEv=$(az eventhubs eventhub list --resource-group $(resourceGroupName) --namespace-name $(eventHubName) --query "[?contains(name, 'actions-eventhub')]".name --output tsv)
             actionsEvConn=$(az eventhubs eventhub authorization-rule keys list --resource-group $(resourceGroupName) --namespace-name $(eventHubName) --eventhub-name $actionsEv --name $ehActionsAuthRule --query primaryConnectionString --output tsv)
             az keyvault secret set --vault-name $(keyVaultName) --name 'AlertingActionsFunction--ActionsEventHubConnectionString' --value $actionsEvConn
-
             mapskey=$(az maps account keys list --name $(mapsName) --resource-group $(resourceGroupName) --query primaryKey --output tsv)
             az keyvault secret set --vault-name $(keyVaultName) --name 'ConfigService--AzureMapsKey' --value $mapskey
-
             key=$(az keyvault secret show --vault-name $(keyVaultName) -n IdentityGatewayService--PrivateKey)
             if [ -z "$key" ]
             then
