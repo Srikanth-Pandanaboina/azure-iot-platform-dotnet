@@ -120,6 +120,7 @@ stages:
       subscriptionId: $(subscriptionId)
       applicationCode: $(applicationCode)
       applicationShortCode: $(applicationShortCode)
+      appInsightsLocation: eastus
       environmentCategory: $(environmentCategory)
       kubernetesVersion: $(kubernetesVersion)
       sendgridEmail: $(sendGridEmail)
