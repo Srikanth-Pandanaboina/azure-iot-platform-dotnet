@@ -199,7 +199,6 @@ stages:
               --no-cache
               --no-dependencies
               --packages .nuget
-              --runtime $(dotnetProductionRuntimeId)
               /p:TargetLatestRuntimePatch=true
             displayName: Restore dependencies
 
@@ -209,7 +208,6 @@ stages:
               --no-restore
               --no-dependencies
               --configuration $(dotnetBuildConfiguration)
-              --runtime $(dotnetProductionRuntimeId)
               /p:TargetLatestRuntimePatch=true
             displayName: Build assemblies
 
