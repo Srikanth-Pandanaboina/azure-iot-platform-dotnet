@@ -69,76 +69,6 @@ export class DeploymentStatus extends LinkedComponent {
                 this.props.selectedDeployment.id
             );
         }
-    }
-
-    // getOpenModal = () => {
-    //     debugger;
-    //     const {
-    //         t,
-    //         deleteIsPending,
-    //         deleteError,
-    //         deleteItem,
-    //         logEvent,
-    //     } = this.props;
-    //     if (
-    //         this.state.openModalName === "delete-deployment" &&
-    //         this.props.currentDeployment
-    //     ) {
-    //         logEvent(
-    //             toSinglePropertyDiagnosticsModel(
-    //                 "DeploymentStatus_DeleteClick",
-    //                 "DeploymentId",
-    //                 this.props.currentDeployment
-    //                     ? this.props.currentDeployment.id
-    //                     : ""
-    //             )
-    //         );
-    //         return (
-    //             <DeleteModal
-    //                 t={t}
-    //                 deleteItem={deleteItem}
-    //                 error={deleteError}
-    //                 isPending={deleteIsPending}
-    //                 itemId={this.props.currentDeployment.id}
-    //                 onClose={this.closeModal}
-    //                 onDelete={this.onDelete}
-    //                 logEvent={logEvent}
-    //                 title={this.props.t("deployments.modals.delete.title")}
-    //                 deleteInfo={this.props.t("deployments.modals.delete.info", {
-    //                     deploymentName: this.props.currentDeployment.name,
-    //                 })}
-    //             />
-    //         );
-    //     }
-    //     return null;
-    // };
-
-    getOpenModal = () => {
-        console.log(this.state.openModalName);
-        const {
-            t,
-            deleteIsPending,
-            deleteError,
-            deleteItem,
-            logEvent,
-        } = this.props;
-
-        return (
-            <DeleteModal
-                t={t}
-                deleteItem={deleteItem}
-                error={deleteError}
-                isPending={deleteIsPending}
-                itemId={"1340"}
-                onClose={this.closeModal}
-                onDelete={this.onDelete}
-                logEvent={logEvent}
-                title={this.props.t("deployments.modals.delete.title")}
-                deleteInfo={this.props.t("deployments.modals.delete.info", {
-                    deploymentName: "Test Deployment",
-                })}
-            />
-        );
     };
 
     activateOrInactivateDeployment(deploymentId) {
@@ -160,19 +90,6 @@ export class DeploymentStatus extends LinkedComponent {
         this.genericCloseClick("DeploymentStatus_CloseClick");
         this.props.fetchDeployments();
     }
-
-    apply = (event) => {
-        event.preventDefault();
-        if (this.state.haschanged) {
-            if (this.state.isActive) {
-                this.props.reactivateDeployment(
-                    this.props.selectedDeployment.id
-                );
-            } else {
-                this.props.deleteItem(this.props.selectedDeployment.id);
-            }
-        }
-    };
 
     render() {
         const { t } = this.props;

@@ -142,10 +142,6 @@ export class IoTHubManagerService {
         );
     }
 
-    static reactivateDeployment(id) {
-        return HttpClient.put(`${ENDPOINT}deployments/${id}`);
-    }
-
     /** Returns deployments */
     static getDeploymentDetails(query) {
         return HttpClient.post(`${ENDPOINT}modules`, query).map(
