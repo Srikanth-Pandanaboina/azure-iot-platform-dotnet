@@ -181,7 +181,7 @@ stages:
             artifact: $(publishedFilesArtifactName)
             displayName: Publish services artifacts
 
-      - job: build
+      - job: functionBuild
         displayName: Build Windows
         pool:
             vmImage: 'vs2017-win2016'
