@@ -55,7 +55,6 @@ stages:
                 echo "A value for the 'imageTag' variable must be provided" > /dev/stderr
                 exit 1
               fi
-        displayName: Check parameters
 
   - stage: deployCode
     displayName: Deploy code
