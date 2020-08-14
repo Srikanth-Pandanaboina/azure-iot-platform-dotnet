@@ -1028,7 +1028,6 @@ jobs:
           azureSubscription: ${{parameters.subscriptionName}}
           appName: $(appName)
           package: $(Build.SourcesDirectory)/$(functionName).zip
-          runtimeStack: 'DOCKER|mcr.microsoft.com/azure-functions/dotnet:3.0'
 
   - job: automationAccount
     displayName: Provision Azure Automation and Sendgrid accounts
