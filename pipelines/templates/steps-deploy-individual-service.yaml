@@ -38,7 +38,7 @@ steps:
         set -Eeuxo pipefail
         az aks get-credentials --name ${{parameters.aksName}} --resource-group ${{parameters.resourceGroupName}} --overwrite-existing
         kubectl get pods
-        type=`kubectl get svc webui -o=jsonpath='{.spec.selector.type}'`
+        type=`kubectl get svc {{parameters.serviceName}} -o=jsonpath='{.spec.selector.type}'`
         echo "$type"
         if [ $type == 'green' ]
         then
