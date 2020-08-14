@@ -126,3 +126,7 @@ stages:
       sendgridEmail: $(sendGridEmail)
       sysAdmins: $(sysAdmins)
       aksAgentVmSize: $(aksAgentVmSize)
+      azureDevOpsProjectId: AzurePlatform
+      testPipelineId: 453
+      runVersion: specific
+      testPipelineRunId: $(testPipelineRunId)
