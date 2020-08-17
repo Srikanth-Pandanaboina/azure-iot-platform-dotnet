@@ -145,10 +145,10 @@ steps:
         set -Eeuxo pipefail
         az aks get-credentials --name ${{parameters.aksName}} --resource-group ${{parameters.resourceGroupName}} --overwrite-existing
         kubectl get pods 
-        status = `kubectl describe pod ${{parameters.serviceName}}-"$(type)" | grep 'Status:' | tr -s " " | cut -d ':' -f2`
-        echo "$status"
-        if [ $status != ' Running' ]
-        then
-          sleep 10
-        fi
+        while [ $status -lt 2 ];
+        do 
+          status=`kubectl get pods -l type=$(type) -l app.kubernetes.io/instance=${{parameters.serviceName}} -o json | jq -r .items[].status.phase | grep "Running" | wc -l`
+          echo $status
+        #status = `kubectl describe pod ${{parameters.serviceName}}-"$(type)" | grep 'Status:' | tr -s " " | cut -d ':' -f2`
+        done
         kubectl patch svc ${{parameters.serviceName}} -p '{"spec": {"selector": {"app.kubernetes.io/name":"${{parameters.serviceName}}", "type": "$(type)"}}}'
