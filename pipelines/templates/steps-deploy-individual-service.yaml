@@ -151,7 +151,9 @@ steps:
         while [ $status -lt 1 ]
         do 
           echo "In loop"
-          status=`kubectl get pods -l type="$(type)" -l app.kubernetes.io/instance=${{parameters.serviceName}}-"$(type)" -o json | jq -r .items[1].status.phase | grep "Running" | wc -l`
-          echo $status
+          status=`kubectl get pods -l type="$(type)" -l app.kubernetes.io/instance=${{parameters.serviceName}}-"$(type)" -o json | jq -r .items[1].status.phase`
+          echo "1 $status"
+          status=echo "$status" | grep "Running" | wc -l
+          echo "2 $status"
         done
         kubectl patch svc ${{parameters.serviceName}} -p '{"spec": {"selector": {"app.kubernetes.io/name":"${{parameters.serviceName}}", "type": "$(type)"}}}'
