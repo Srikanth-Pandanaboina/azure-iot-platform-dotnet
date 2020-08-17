@@ -145,7 +145,7 @@ steps:
         set -Eeuxo pipefail
         az aks get-credentials --name ${{parameters.aksName}} --resource-group ${{parameters.resourceGroupName}} --overwrite-existing
         kubectl get pods 
-        status = `kubectl describe pod ${{parameters.serviceName}}-$(type) | grep 'Status:' | tr -s " " | cut -d ':' -f2`
+        status = `kubectl describe pod ${{parameters.serviceName}}-${{paramters.type}} | grep 'Status:' | tr -s " " | cut -d ':' -f2`
         echo "$status"
         if [ $status != ' Running' ]
         then
