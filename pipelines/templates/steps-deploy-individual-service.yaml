@@ -37,7 +37,8 @@ steps:
       inlineScript: |-
         set -Eeuxo pipefail
         az aks get-credentials --name ${{parameters.aksName}} --resource-group ${{parameters.resourceGroupName}} --overwrite-existing
-        kubectl get pods
+        kubectl get svc
+        echo "{{parameters.serviceName}}"
         type=`kubectl get svc {{parameters.serviceName}} -o=jsonpath='{.spec.selector.type}'`
         echo "$type"
         if [ $type == 'green' ]
