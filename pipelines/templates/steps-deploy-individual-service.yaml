@@ -147,7 +147,7 @@ steps:
         kubectl get pods 
         echo "$(type)"
         status=`kubectl get pods -l type="$(type)" -l app.kubernetes.io/instance=${{parameters.serviceName}}-"$(type)" -o json | jq -r .items[1].status.phase | grep "Running" | wc -l`
-        while [ $status -ne 1 ];
+        while [ $status != 1 ];
         do 
           status=`kubectl get pods -l type="$(type)" -l app.kubernetes.io/instance=${{parameters.serviceName}}-"$(type)" -o json | jq -r .items[1].status.phase | grep "Running" | wc -l`
           echo $status
