@@ -146,7 +146,7 @@ steps:
         az aks get-credentials --name ${{parameters.aksName}} --resource-group ${{parameters.resourceGroupName}} --overwrite-existing
         kubectl get pods 
         echo "$(type)"
-        status=`kubectl get pods -l type="$(type)" -l app.kubernetes.io/instance=${{parameters.serviceName}}-"$(type)" -o json | jq -r .items[1].status.phase | grep "Running" | wc -l`
+        status=$(kubectl get pods -l type="$(type)" -l app.kubernetes.io/instance=${{parameters.serviceName}}-"$(type)" -o json | jq -r .items[1].status.phase | grep "Running" | wc -l)
         echo "Status is $status"
         while [ $status -lt 1 ]
         do 
