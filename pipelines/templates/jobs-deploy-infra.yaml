@@ -1216,7 +1216,7 @@ jobs:
           scriptType: bash
           inlineScript: |-
             helm version
-            helm repo add stable https://charts.helm.sh/stable
+            helm repo add stable https://kubernetes-charts.storage.googleapis.com/
             helm repo update
             n=0
             until [ $n -ge 5 ]
@@ -1232,6 +1232,7 @@ jobs:
                   --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
                   --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="$(aksName)" \
                   --wait \
+                  --version 1.41.3 \
                 2>&1 && break
               n=$[$n+1]
               sleep 1m
