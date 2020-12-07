@@ -1231,6 +1231,7 @@ jobs:
                   --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
                   --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
                   --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="$(aksName)" \
+                  --timeout 10m0s
                   --version 1.41.2 \
                   --wait \
                 2>&1 && break
