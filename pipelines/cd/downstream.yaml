@@ -2,8 +2,8 @@ trigger: none
 pr: none
 resources:
   pipelines:
-    - pipeline: testV3
-      source: azure-iot-platform-dotnet.ci.test-v3
+    - pipeline: test
+      source: azure-iot-platform-dotnet.ci.test
       project: AzurePlatform
       trigger:
         stages:
