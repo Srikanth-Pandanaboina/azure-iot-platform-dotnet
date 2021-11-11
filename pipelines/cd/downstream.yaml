@@ -6,6 +6,8 @@ resources:
       source: azure-iot-platform-dotnet.ci.test-v3
       project: AzurePlatform
       trigger:
+        stages:
+          - listCommitsSinceLastRelease
         branches:
           - master
 stages:
