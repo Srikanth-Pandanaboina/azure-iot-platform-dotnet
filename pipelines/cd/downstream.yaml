@@ -22,10 +22,16 @@ stages:
 
           - script: |-
               set -Eeuxo pipefail
-              echo "Image tag: '$(var)'"
-              if [ -z "$(var)" ]
+              echo "envName: '$(envName)'"
+              echo "envCategory": '$(envCategory)'
+              if [ -z "$(envName)" ]
               then
-                echo "A value for the 'var' variable must be provided" > /dev/stderr
+                echo "A value for the 'envName' variable must be provided" > /dev/stderr
+                exit 1
+              fi
+              if [ -z "$(envCategory)" ]
+              then
+                echo "A value for the 'envCategory' variable must be provided" > /dev/stderr
                 exit 1
               fi
             displayName: Print
